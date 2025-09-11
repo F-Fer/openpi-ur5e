@@ -72,7 +72,7 @@ class UR5EInputs(transforms.DataTransformFn):
         return inputs
 
 @dataclasses.dataclass(frozen=True)
-class DroidOutputs(transforms.DataTransformFn):
+class UR5EOutputs(transforms.DataTransformFn):
     def __call__(self, data: dict) -> dict:
         # Only return the first 7 dims.
         return {"actions": np.asarray(data["actions"][:, :7])}

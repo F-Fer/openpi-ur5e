@@ -20,6 +20,7 @@ import openpi.models.tokenizer as _tokenizer
 import openpi.policies.aloha_policy as aloha_policy
 import openpi.policies.droid_policy as droid_policy
 import openpi.policies.libero_policy as libero_policy
+import openpi.policies.ur5e_policy as ur5e_policy
 import openpi.shared.download as _download
 import openpi.shared.normalize as _normalize
 import openpi.training.droid_rlds_dataset as droid_rlds_dataset
@@ -960,6 +961,23 @@ _CONFIGS = [
     # RoboArena configs.
     #
     *roboarena_config.get_roboarena_configs(),
+    #
+    # Inference UR5E configs.
+    #
+    TrainConfig(
+        name="pi0_ur5e",
+        model=pi0_config.Pi0Config(action_horizon=16),
+        data=SimpleDataConfig(
+            assets=AssetsConfig(asset_dir="gs://openpi-assets/checkpoints/pi0_base/assets"),
+            data_transforms=lambda model: _transforms.Group(
+                inputs=[ur5e_policy.UR5EInputs(model_type=ModelType.PI0)],
+                outputs=[ur5e_policy.UR5EOutputs()],
+            ),
+            base_config=DataConfig(
+                prompt_from_task=True,
+            ),
+        ),
+    ),
 ]
 
 if len({config.name for config in _CONFIGS}) != len(_CONFIGS):
