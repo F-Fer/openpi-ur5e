@@ -11,6 +11,7 @@ services:
       - XLA_PYTHON_CLIENT_MEM_FRACTION=0.9
       - HF_HOME=/workspace/.cache/huggingface
       - WANDB_API_KEY=${WANDB_API_KEY:-}
+      - HUGGINGFACE_HUB_TOKEN=${HUGGINGFACE_HUB_TOKEN:-}
     volumes:
       - ./checkpoints:/workspace/checkpoints
       - ./assets:/workspace/assets
