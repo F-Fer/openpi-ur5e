@@ -23,3 +23,37 @@ docker compose -f examples/<example_name>/compose.yml up --build
 where `<example_name>` is the name of the example you want to run.
 
 During the first run of any example, Docker will build the images. Go grab a coffee while this happens. Subsequent runs will be faster since the images are cached.
+
+### Vast.ai Docker Workflow
+
+We provide a ready-to-use Docker setup at the repository root. This container bundles the repository and dependencies so you do not need to clone the repo or run `uv sync` manually on remote machines.
+
+1. **Build the image (optional)**
+   ```bash
+   docker build -t openpi-ur5e:latest .
+   ```
+   Publish the image to your container registry if you want to pull it from vast.ai instances.
+
+2. **Run the container**
+   ```bash
+   docker run --gpus all -it \
+     -e WANDB_API_KEY=your_wandb_key \
+     -e XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 \
+     -v /path/to/persistent/checkpoints:/workspace/checkpoints \
+     -v /path/to/persistent/assets:/workspace/assets \
+     openpi-ur5e:latest
+   ```
+
+   Inside the container use the helper script:
+   ```bash
+   ./setup_and_train.sh
+   ```
+   This script lets you verify the environment, compute normalization statistics (if needed), launch JAX or PyTorch training, and start the inference server.
+
+3. **docker-compose alternative**
+   ```bash
+   WANDB_API_KEY=your_wandb_key docker-compose up -d
+   docker-compose exec openpi ./setup_and_train.sh
+   ```
+
+Mount additional volumes for datasets or other assets as needed. Feel free to customize `docker-compose.yml` for multi-container workflows.

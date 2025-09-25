@@ -1,3 +1,11 @@
-.venv
-checkpoints
-data
+checkpoints/
+assets/
+wandb/
+.venv/
+__pycache__/
+.git/
+.gitignore
+*.pyc
+*.pyo
+*.pyd
+*.log

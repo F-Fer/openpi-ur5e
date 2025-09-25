@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  openpi:
+    image: openpi-ur5e:latest
+    build: .
+    container_name: openpi-ur5e
+    runtime: nvidia
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - XLA_PYTHON_CLIENT_MEM_FRACTION=0.9
+      - HF_HOME=/workspace/.cache/huggingface
+      - WANDB_API_KEY=${WANDB_API_KEY:-}
+    volumes:
+      - ./checkpoints:/workspace/checkpoints
+      - ./assets:/workspace/assets
+      - ./wandb:/workspace/wandb
+      - ./datasets:/workspace/datasets:ro
+    working_dir: /workspace
+    command: bash
