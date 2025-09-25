@@ -1053,6 +1053,24 @@ _CONFIGS = [
                 prompt_from_task=True,
             ),
         ),
+    ), 
+    #
+    # Fine-tuning UR5 configs.
+    #
+    TrainConfig(
+        name="pi0_ur5e_finetune_lora",
+        model=pi0_config.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=16),
+        data=LeRobotUR5DataConfig(
+            repo_id="F-Fer/ur-1",
+            base_config=DataConfig(prompt_from_task=True),
+            extra_delta_transform=True,
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
+        num_train_steps=30_000,
+        freeze_filter=pi0_config.Pi0Config(
+            paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
+        ).get_freeze_filter(),
+        ema_decay=None,
     ),
 ]
 
