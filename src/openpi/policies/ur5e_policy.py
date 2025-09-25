@@ -32,12 +32,24 @@ class UR5EInputs(transforms.DataTransformFn):
     model_type: _model.ModelType = _model.ModelType.PI0
 
     def __call__(self, data: dict) -> dict:
-        gripper_pos = np.asarray(data["observation/gripper_position"])
-        if gripper_pos.ndim == 0:
-            # Ensure gripper position is a 1D array, not a scalar, so we can concatenate with joint positions
-            gripper_pos = gripper_pos[np.newaxis]
+        joints = np.asarray(data["observation/joint_position"])
 
-        state = np.concatenate([data["observation/joint_position"], gripper_pos])
+        if "observation/gripper_position" in data:
+            gripper_pos = np.asarray(data["observation/gripper_position"])
+            if gripper_pos.ndim == 0:
+                # Ensure gripper position is a 1D array, not a scalar, so we can concatenate with joint positions
+                gripper_pos = gripper_pos[np.newaxis]
+            state = np.concatenate([joints, gripper_pos])
+        else:
+            # Gripper position is embedded in the state.
+            if joints.ndim.shape[-1] == 7:
+                state = joints
+            if joints.ndim.shape[-1] == 6:
+                # No gripper position in the state. Add a zero.
+                np.concatenate([joints, np.zeros(1, dtype=joints.dtype)])
+            else:
+                raise ValueError(f"Joints dimension is {joints.ndim}, expected 6 or 7.")
+
         base_image = _parse_image(data["observation/exterior_image_1_left"])
         wrist_image = _parse_image(data["observation/wrist_image_left"])
 
