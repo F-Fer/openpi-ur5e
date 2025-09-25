@@ -1044,7 +1044,7 @@ _CONFIGS = [
         name="pi0_ur5e",
         model=pi0_config.Pi0Config(action_horizon=16),
         data=SimpleDataConfig(
-            assets=AssetsConfig(asset_dir="gs://openpi-assets/checkpoints/pi0_base/assets"),
+            assets=AssetsConfig(assets_dir="gs://openpi-assets/checkpoints/pi0_base/assets"),
             data_transforms=lambda model: _transforms.Group(
                 inputs=[ur5e_policy.UR5EInputs(model_type=ModelType.PI0)],
                 outputs=[ur5e_policy.UR5EOutputs()],
@@ -1062,8 +1062,15 @@ _CONFIGS = [
         model=pi0_config.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=16),
         data=LeRobotUR5DataConfig(
             repo_id="F-Fer/ur-1",
-            base_config=DataConfig(prompt_from_task=True),
+            base_config=DataConfig(
+                prompt_from_task=True,
+                action_sequence_keys=("action",),
+            ),
             extra_delta_transform=True,
+            assets=AssetsConfig(
+                assets_dir="gs://openpi-assets/checkpoints/pi0_base/assets",
+                asset_id="ur5e",
+            ),
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
         num_train_steps=30_000,
