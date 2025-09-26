@@ -383,6 +383,7 @@ class LeRobotUR5DataConfig(DataConfigFactory):
                         "observation/wrist_image_left": "observation.images.secondary_0",
                         "observation/joint_position": "observation.state", # No extra gripper position. Gripper is in the state.
                         "actions": "action",
+                        "prompt": "prompt",
                     }
                 )
             ]
