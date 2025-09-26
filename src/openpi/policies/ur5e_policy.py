@@ -33,6 +33,10 @@ class UR5EInputs(transforms.DataTransformFn):
 
     def __call__(self, data: dict) -> dict:
         joints = np.asarray(data["observation/joint_position"])
+        joints = np.squeeze(joints)
+
+        if joints.ndim != 1:
+            raise ValueError(f"Expected joints to be 1D, got shape {joints.shape}")
 
         if "observation/gripper_position" in data:
             gripper_pos = np.asarray(data["observation/gripper_position"])
@@ -45,7 +49,7 @@ class UR5EInputs(transforms.DataTransformFn):
             if joints.shape[-1] == 8:
                 state = joints
             elif joints.shape[-1] == 7:
-                # No explicit gripper position; append a zero placeholder.
+                # Append zero placeholder for missing gripper value.
                 state = np.concatenate([joints, np.zeros(1, dtype=joints.dtype)])
             else:
                 raise ValueError(f"Unexpected joint/state shape: {joints.shape}")
