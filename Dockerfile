@@ -18,7 +18,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     openssh-server \
     sudo \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgomp1 \
+    ffmpeg \
+    libavcodec-extra \
     && rm -rf /var/lib/apt/lists/*
+
+apt-get install -y \
+    ffmpeg \
+    libavcodec-extra \
 
 # Symlink python3.10 -> python
 RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
