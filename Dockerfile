@@ -16,6 +16,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3.10-venv \
     python3-distutils \
     ca-certificates \
+    openssh-server \
+    sudo \
     && rm -rf /var/lib/apt/lists/*
 
 # Symlink python3.10 -> python
@@ -40,5 +42,29 @@ ENV PYTHONPATH=/workspace/src
 RUN uv sync --extra-index-url https://download.pytorch.org/whl/cu118 && \
     uv pip install -e .
 
+# Install Jupyter and additional packages
+RUN uv pip install jupyter jupyterlab ipywidgets
+
+# Setup SSH server
+RUN mkdir /var/run/sshd && \
+    echo 'root:root' | chpasswd && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+# Create startup script
+RUN echo '#!/bin/bash\n\
+# Start SSH server\n\
+service ssh start\n\
+\n\
+# Change to workspace directory and start Jupyter Lab using uv\n\
+cd /workspace\n\
+uv run jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token="" --NotebookApp.password="" &\n\
+\n\
+# Keep container running\n\
+sleep infinity' > /start.sh && chmod +x /start.sh
+
+# Expose ports
+EXPOSE 22 8888
+
 # Default command
-CMD ["bash"]
+CMD ["/start.sh"]

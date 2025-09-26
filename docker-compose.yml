@@ -17,5 +17,8 @@ services:
       - ./assets:/workspace/assets
       - ./wandb:/workspace/wandb
       - ./datasets:/workspace/datasets:ro
+    ports:
+      - "8888:8888"  # Jupyter Lab
+      - "2222:22"    # SSH
     working_dir: /workspace
-    command: bash
+    command: /start.sh

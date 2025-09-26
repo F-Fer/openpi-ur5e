@@ -41,8 +41,13 @@ We provide a ready-to-use Docker setup at the repository root. This container bu
      -e XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 \
      -v /path/to/persistent/checkpoints:/workspace/checkpoints \
      -v /path/to/persistent/assets:/workspace/assets \
+     -p 8888:8888 -p 2222:22 \
      openpi-ur5e:latest
    ```
+
+   **Connecting to the container:**
+   - **Jupyter Lab**: Open `http://localhost:8888` in your browser (no password required)
+   - **SSH**: `ssh -p 2222 root@localhost` (password: `root`)
 
    Inside the container use the helper script:
    ```bash
@@ -53,7 +58,16 @@ We provide a ready-to-use Docker setup at the repository root. This container bu
 3. **docker-compose alternative**
    ```bash
    WANDB_API_KEY=your_wandb_key docker-compose up -d
-   docker-compose exec openpi ./setup_and_train.sh
+   ```
+   
+   **Connecting to the container:**
+   - **Jupyter Lab**: Open `http://localhost:8888` in your browser (no password required)
+   - **SSH**: `ssh -p 2222 root@localhost` (password: `root`)
+   - **Exec into container**: `docker-compose exec openpi bash`
+   
+   Then use the helper script:
+   ```bash
+   ./setup_and_train.sh
    ```
 
 Mount additional volumes for datasets or other assets as needed. Feel free to customize `docker-compose.yml` for multi-container workflows.
