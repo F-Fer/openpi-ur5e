@@ -28,10 +28,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libavcodec-extra \
     && rm -rf /var/lib/apt/lists/*
 
-apt-get install -y \
-    ffmpeg \
-    libavcodec-extra \
-
 # Symlink python3.10 -> python
 RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
     ln -sf /usr/bin/python3.10 /usr/bin/python3
@@ -70,7 +66,7 @@ service ssh start\n\
 \n\
 # Change to workspace directory and start Jupyter Lab using uv\n\
 cd /workspace\n\
-uv run jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token="" --NotebookApp.password="" &\n\
+   uv run jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --ServerApp.allow_origin='*' --ServerApp.allow_remote_access=True --ServerApp.disable_check_xsrf=True --ServerApp.root_dir=/workspace --NotebookApp.token="" --NotebookApp.password="" &\n\
 \n\
 # Keep container running\n\
 sleep infinity' > /start.sh && chmod +x /start.sh

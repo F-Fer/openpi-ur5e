@@ -41,14 +41,14 @@ class UR5EInputs(transforms.DataTransformFn):
                 gripper_pos = gripper_pos[np.newaxis]
             state = np.concatenate([joints, gripper_pos])
         else:
-            # Gripper position is embedded in the state.
-            if joints.ndim.shape[-1] == 7:
+            # Gripper position is embedded in the state or missing.
+            if joints.shape[-1] == 8:
                 state = joints
-            if joints.ndim.shape[-1] == 6:
-                # No gripper position in the state. Add a zero.
-                np.concatenate([joints, np.zeros(1, dtype=joints.dtype)])
+            elif joints.shape[-1] == 7:
+                # No explicit gripper position; append a zero placeholder.
+                state = np.concatenate([joints, np.zeros(1, dtype=joints.dtype)])
             else:
-                raise ValueError(f"Joints dimension is {joints.ndim}, expected 6 or 7.")
+                raise ValueError(f"Unexpected joint/state shape: {joints.shape}")
 
         base_image = _parse_image(data["observation/exterior_image_1_left"])
         wrist_image = _parse_image(data["observation/wrist_image_left"])
