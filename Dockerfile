@@ -32,7 +32,7 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
 WORKDIR /workspace
 
 # Clone repository with submodules
-RUN git clone --recurse-submodules https://github.com/Physical-Intelligence/openpi.git .
+RUN git clone --recurse-submodules https://github.com/F-Fer/openpi-ur5e.git .
 
 # Set environment variables as per README setup
 ENV GIT_LFS_SKIP_SMUDGE=1
