@@ -7,6 +7,7 @@ import logging
 from typing import Protocol
 
 from etils import epath
+import os
 import jax
 import orbax.checkpoint as ocp
 import orbax.checkpoint.future as future
@@ -85,6 +86,8 @@ def save_state(
     }
     checkpoint_manager.save(step, items)
 
+    _maybe_upload_to_huggingface(checkpoint_manager, step)
+
 
 def restore_state(
     checkpoint_manager: ocp.CheckpointManager,
@@ -157,3 +160,39 @@ def _merge_params(train_state: training_utils.TrainState, params: dict[str, at.P
     if train_state.params:
         return dataclasses.replace(train_state, ema_params=params["params"])
     return dataclasses.replace(train_state, params=params["params"])
+
+
+def _maybe_upload_to_huggingface(checkpoint_manager: ocp.CheckpointManager, step: int) -> None:
+    """
+    Upload the checkpoint to Hugging Face if the HF_UPLOAD_REPO_ID environment variable is set.
+    """
+    repo_id = os.environ.get("HF_UPLOAD_REPO_ID")
+    if not repo_id:
+        return
+
+    try:
+        from huggingface_hub import upload_folder
+    except ImportError:  # pragma: no cover - optional dependency
+        logging.warning("huggingface_hub is not installed; skipping checkpoint upload.")
+        return
+
+    revision = os.environ.get("HF_UPLOAD_REVISION", "main")
+    path_in_repo = os.environ.get("HF_UPLOAD_PATH", "checkpoints")
+
+    checkpoint_root = checkpoint_manager._directory / str(step)  # type: ignore[attr-defined]
+    if not checkpoint_root.exists():
+        logging.warning("Checkpoint directory %s does not exist; skipping upload.", checkpoint_root)
+        return
+
+    logging.info("Uploading checkpoint step %s to Hugging Face repo %s", step, repo_id)
+    try:
+        upload_folder(
+            repo_id=repo_id,
+            repo_type="model",
+            folder_path=str(checkpoint_root),
+            path_in_repo=f"{path_in_repo.rstrip('/')}/{checkpoint_root.name}",
+            commit_message=f"Add checkpoint step {step}",
+            revision=revision,
+        )
+    except Exception as exc:  # pragma: no cover - uploading is best-effort
+        logging.warning("Failed to upload checkpoint step %s: %s", step, exc)
