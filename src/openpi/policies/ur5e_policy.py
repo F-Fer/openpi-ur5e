@@ -29,7 +29,7 @@ def _parse_image(image) -> np.ndarray:
 
 @dataclasses.dataclass(frozen=True)
 class UR5EInputs(transforms.DataTransformFn):
-    model_type: _model.ModelType = _model.ModelType.PI0
+    model_type: _model.ModelType
 
     def __call__(self, data: dict) -> dict:
         joints = np.asarray(data["observation/joint_position"])

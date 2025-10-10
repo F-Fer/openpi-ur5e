@@ -1039,24 +1039,7 @@ _CONFIGS = [
     #
     *roboarena_config.get_roboarena_configs(),
     #
-    # Inference UR5E configs.
-    #
-    TrainConfig(
-        name="pi0_ur5e",
-        model=pi0_config.Pi0Config(action_horizon=16),
-        data=SimpleDataConfig(
-            assets=AssetsConfig(assets_dir="gs://openpi-assets/checkpoints/pi0_base/assets"),
-            data_transforms=lambda model: _transforms.Group(
-                inputs=[ur5e_policy.UR5EInputs(model_type=ModelType.PI0)],
-                outputs=[ur5e_policy.UR5EOutputs()],
-            ),
-            base_config=DataConfig(
-                prompt_from_task=True,
-            ),
-        ),
-    ), 
-    #
-    # Fine-tuning UR5 configs.
+    # UR5 configs.
     #
     TrainConfig(
         name="pi0_ur5e_finetune_lora",
@@ -1069,8 +1052,7 @@ _CONFIGS = [
             ),
             extra_delta_transform=True,
             assets=AssetsConfig(
-                assets_dir="gs://openpi-assets/checkpoints/pi0_base/assets",
-                asset_id="ur5e",
+                asset_id="F-Fer/ur-1"
             ),
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
