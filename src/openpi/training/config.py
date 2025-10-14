@@ -364,6 +364,7 @@ class LeRobotUR5DataConfig(DataConfigFactory):
     """
 
     extra_delta_transform: bool = False
+    action_sequence_keys: Sequence[str] = ("action",) 
 
     @override
     def create(self, assets_dirs: pathlib.Path, model_config: _model.BaseModelConfig) -> DataConfig:
@@ -1042,24 +1043,52 @@ _CONFIGS = [
     # UR5 configs.
     #
     TrainConfig(
-        name="pi0_ur5e_finetune_lora",
+        name="pi0_ur5e_lora",
         model=pi0_config.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=16),
         data=LeRobotUR5DataConfig(
             repo_id="F-Fer/ur-1",
             base_config=DataConfig(
                 prompt_from_task=True,
-                action_sequence_keys=("action",),
             ),
-            extra_delta_transform=True,
-            assets=AssetsConfig(
-                asset_id="F-Fer/ur-1"
-            ),
+            extra_delta_transform=True
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
-        num_train_steps=30_000,
+        num_train_steps=5_000,
         freeze_filter=pi0_config.Pi0Config(
             paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
         ).get_freeze_filter(),
+        ema_decay=None,
+    ),
+    TrainConfig(
+        name="pi0_ur5e_fast_lora",
+        model=pi0_fast.Pi0FASTConfig(action_dim=7, action_horizon=16, max_token_len=180, paligemma_variant="gemma_2b_lora"),
+        data=LeRobotUR5DataConfig(
+            repo_id="F-Fer/ur-1",
+            base_config=DataConfig(
+                prompt_from_task=True,
+            ),
+            extra_delta_transform=True,
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_fast_droid"),
+        num_train_steps=5_000,
+        freeze_filter=pi0_config.Pi0Config(
+            paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
+        ).get_freeze_filter(),
+        ema_decay=None,
+    ),
+    TrainConfig(
+        name="pi05_ur5e_lora",
+        model=pi0_config.Pi0Config(pi05=True, paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=16),
+        data=LeRobotUR5DataConfig(
+            repo_id="F-Fer/ur-1",
+            base_config=DataConfig(
+                prompt_from_task=True,
+            ),
+            extra_delta_transform=True,
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_droid"),
+        num_train_steps=5_000,
+        freeze_filter=pi0_fast.Pi0FASTConfig(action_dim=7, action_horizon=16, max_token_len=180, paligemma_variant="gemma_2b_lora").get_freeze_filter(),
         ema_decay=None,
     ),
 ]
