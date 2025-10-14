@@ -59,17 +59,9 @@ RUN mkdir /var/run/sshd && \
     sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
     sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
 
-# Create startup script
-RUN echo '#!/bin/bash\n\
-# Start SSH server\n\
-service ssh start\n\
-\n\
-# Change to workspace directory and start Jupyter Lab using uv\n\
-cd /workspace\n\
-   uv run jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --ServerApp.allow_origin='*' --ServerApp.allow_remote_access=True --ServerApp.disable_check_xsrf=True --ServerApp.root_dir=/workspace --NotebookApp.token="" --NotebookApp.password="" &\n\
-\n\
-# Keep container running\n\
-sleep infinity' > /start.sh && chmod +x /start.sh
+# Copy startup script
+COPY docker/start.sh /start.sh
+RUN chmod +x /start.sh
 
 # Expose ports
 EXPOSE 22 8888
