@@ -1077,7 +1077,7 @@ _CONFIGS = [
             extra_delta_transform=True,
 
         ),
-        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_fast_droid"),
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_fast_droid/params"),
         num_train_steps=5_000,
         freeze_filter=pi0_config.Pi0Config(
             paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
@@ -1097,7 +1097,7 @@ _CONFIGS = [
             ),
             extra_delta_transform=True,
         ),
-        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_droid"),
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_droid/params"),
         num_train_steps=5_000,
         freeze_filter=pi0_fast.Pi0FASTConfig(action_dim=7, action_horizon=16, max_token_len=180, paligemma_variant="gemma_2b_lora").get_freeze_filter(),
         ema_decay=None,
