@@ -1050,7 +1050,10 @@ _CONFIGS = [
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
-            extra_delta_transform=True
+            assets=AssetsConfig(
+                asset_id="F-Fer/ur-1"
+            ),
+            extra_delta_transform=True,
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
         num_train_steps=5_000,
@@ -1067,7 +1070,11 @@ _CONFIGS = [
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
+            assets=AssetsConfig(
+                asset_id="F-Fer/ur-1"
+            ),
             extra_delta_transform=True,
+
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_fast_droid"),
         num_train_steps=5_000,
@@ -1083,6 +1090,9 @@ _CONFIGS = [
             repo_id="F-Fer/ur-1",
             base_config=DataConfig(
                 prompt_from_task=True,
+            ),
+            assets=AssetsConfig(
+                asset_id="F-Fer/ur-1"
             ),
             extra_delta_transform=True,
         ),
