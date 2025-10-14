@@ -5,6 +5,7 @@ import logging
 
 from openpi import transforms
 from openpi.models import model as _model
+from openpi_client import image_tools
 
 logger = logging.getLogger("openpi")
 logger.setLevel(logging.DEBUG)
@@ -19,12 +20,20 @@ def make_ur5e_example() -> dict:
         "prompt": "do something",
     }
 
+_TARGET_IMAGE_HEIGHT = 224
+_TARGET_IMAGE_WIDTH = 224
+
+
 def _parse_image(image) -> np.ndarray:
     image = np.asarray(image)
-    if np.issubdtype(image.dtype, np.floating):
-        image = (255 * image).astype(np.uint8)
-    if image.shape[0] == 3:
+    if image.ndim < 3:
+        raise ValueError(f"Expected image with at least 3 dimensions, got shape {image.shape}")
+
+    if image.shape[0] == 3 and image.ndim == 3 and image.shape[-1] != 3:
         image = einops.rearrange(image, "c h w -> h w c")
+
+    image = image_tools.resize_with_pad(image, _TARGET_IMAGE_HEIGHT, _TARGET_IMAGE_WIDTH)
+    image = image_tools.convert_to_uint8(image)
     return image
 
 @dataclasses.dataclass(frozen=True)
