@@ -26,14 +26,21 @@ _TARGET_IMAGE_WIDTH = 224
 
 def _parse_image(image) -> np.ndarray:
     image = np.asarray(image)
-    if image.ndim < 3:
-        raise ValueError(f"Expected image with at least 3 dimensions, got shape {image.shape}")
+    while image.ndim > 3 and image.shape[0] == 1:
+        image = image[0]
 
-    if image.shape[0] == 3 and image.ndim == 3 and image.shape[-1] != 3:
+    if image.ndim != 3:
+        raise ValueError(f"Expected image with 3 dimensions, got shape {image.shape}")
+
+    # Convert channel-first inputs to channel-last.
+    if image.shape[-1] not in (1, 3) and image.shape[0] in (1, 3):
         image = einops.rearrange(image, "c h w -> h w c")
 
-    image = image_tools.resize_with_pad(image, _TARGET_IMAGE_HEIGHT, _TARGET_IMAGE_WIDTH)
+    if image.shape[-1] not in (1, 3):
+        raise ValueError(f"Expected image channel dimension of size 1 or 3, got shape {image.shape}")
+
     image = image_tools.convert_to_uint8(image)
+    image = image_tools.resize_with_pad(image, _TARGET_IMAGE_HEIGHT, _TARGET_IMAGE_WIDTH)
     return image
 
 @dataclasses.dataclass(frozen=True)
