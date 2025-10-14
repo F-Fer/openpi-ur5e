@@ -6,6 +6,7 @@ import logging
 from openpi import transforms
 from openpi.models import model as _model
 from openpi_client import image_tools
+from openpi.transforms import pad_to_dim
 
 logger = logging.getLogger("openpi")
 logger.setLevel(logging.DEBUG)
@@ -28,6 +29,9 @@ def _parse_image(image) -> np.ndarray:
     image = np.asarray(image)
     while image.ndim > 3 and image.shape[0] == 1:
         image = image[0]
+
+    if image.ndim == 2:
+        image = image[..., None]
 
     if image.ndim != 3:
         raise ValueError(f"Expected image with 3 dimensions, got shape {image.shape}")
@@ -84,6 +88,8 @@ class UR5EInputs(transforms.DataTransformFn):
                 image_masks = (np.True_, np.True_, np.True_)
             case _:
                 raise ValueError(f"Unsupported model type: {self.model_type}")
+
+        state = pad_to_dim(state, 8)
 
         inputs = {
             "state": state,
