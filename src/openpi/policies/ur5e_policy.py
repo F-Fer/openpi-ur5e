@@ -5,45 +5,30 @@ import logging
 
 from openpi import transforms
 from openpi.models import model as _model
-from openpi_client import image_tools
-from openpi.transforms import pad_to_dim
+from openpi.shared import image_tools
 
 logger = logging.getLogger("openpi")
 logger.setLevel(logging.DEBUG)
 
+_TARGET_IMAGE_HEIGHT = 224
+_TARGET_IMAGE_WIDTH = 224
+
 def make_ur5e_example() -> dict:
     """Creates a random input example for the UR5E policy."""
     return {
-        "observation/exterior_image_1_left": np.random.randint(256, size=(224, 224, 3), dtype=np.uint8),
-        "observation/wrist_image_left": np.random.randint(256, size=(224, 224, 3), dtype=np.uint8),
-        "observation/joint_position": np.random.rand(7),
+        "observation/exterior_image_1_left": np.random.randint(256, size=(_TARGET_IMAGE_HEIGHT, _TARGET_IMAGE_WIDTH, 3), dtype=np.uint8),
+        "observation/wrist_image_left": np.random.randint(256, size=(_TARGET_IMAGE_HEIGHT, _TARGET_IMAGE_WIDTH, 3), dtype=np.uint8),
+        "observation/joint_position": np.random.rand(6),
         "observation/gripper_position": np.random.rand(1),
         "prompt": "do something",
     }
 
-_TARGET_IMAGE_HEIGHT = 224
-_TARGET_IMAGE_WIDTH = 224
-
-
 def _parse_image(image) -> np.ndarray:
     image = np.asarray(image)
-    while image.ndim > 3 and image.shape[0] == 1:
-        image = image[0]
-
-    if image.ndim == 2:
-        image = image[..., None]
-
-    if image.ndim != 3:
-        raise ValueError(f"Expected image with 3 dimensions, got shape {image.shape}")
-
-    # Convert channel-first inputs to channel-last.
-    if image.shape[-1] not in (1, 3) and image.shape[0] in (1, 3):
+    if np.issubdtype(image.dtype, np.floating):
+        image = (255 * image).astype(np.uint8)
+    if image.shape[0] == 3:
         image = einops.rearrange(image, "c h w -> h w c")
-
-    if image.shape[-1] not in (1, 3):
-        raise ValueError(f"Expected image channel dimension of size 1 or 3, got shape {image.shape}")
-
-    image = image_tools.convert_to_uint8(image)
     image = image_tools.resize_with_pad(image, _TARGET_IMAGE_HEIGHT, _TARGET_IMAGE_WIDTH)
     return image
 
@@ -66,9 +51,9 @@ class UR5EInputs(transforms.DataTransformFn):
             state = np.concatenate([joints, gripper_pos])
         else:
             # Gripper position is embedded in the state or missing.
-            if joints.shape[-1] == 8:
+            if joints.shape[-1] == 7:
                 state = joints
-            elif joints.shape[-1] == 7:
+            elif joints.shape[-1] == 6:
                 # Append zero placeholder for missing gripper value.
                 state = np.concatenate([joints, np.zeros(1, dtype=joints.dtype)])
             else:
@@ -78,7 +63,7 @@ class UR5EInputs(transforms.DataTransformFn):
         wrist_image = _parse_image(data["observation/wrist_image_left"])
 
         names = ("base_0_rgb", "left_wrist_0_rgb", "right_wrist_0_rgb")
-        images = (base_image, wrist_image, np.zeros_like(base_image))
+        images = (base_image, wrist_image, np.zeros_like(base_image, dtype=np.uint8))
         
         match self.model_type:
             case _model.ModelType.PI0 | _model.ModelType.PI05:
@@ -88,8 +73,6 @@ class UR5EInputs(transforms.DataTransformFn):
                 image_masks = (np.True_, np.True_, np.True_)
             case _:
                 raise ValueError(f"Unsupported model type: {self.model_type}")
-
-        state = pad_to_dim(state, 8)
 
         inputs = {
             "state": state,
