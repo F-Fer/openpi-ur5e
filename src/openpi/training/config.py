@@ -1082,6 +1082,7 @@ _CONFIGS = [
         freeze_filter=pi0_fast.Pi0FASTConfig(action_dim=7, action_horizon=16, max_token_len=90, paligemma_variant="gemma_2b_lora").get_freeze_filter(),
         ema_decay=None,
         batch_size=24,
+        save_interval=100,
     ),
     TrainConfig(
         name="pi05_ur5e_lora",
