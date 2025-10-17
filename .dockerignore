@@ -1,5 +1,4 @@
 checkpoints/
-assets/
 wandb/
 .venv/
 __pycache__/
