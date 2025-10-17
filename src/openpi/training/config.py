@@ -1063,6 +1063,7 @@ _CONFIGS = [
         ).get_freeze_filter(),
         ema_decay=None,
         keep_period=1000,
+        batch_size=24,
     ),
     TrainConfig(
         name="pi0_ur5e_fast_lora",
