@@ -29,7 +29,6 @@ def _parse_image(image) -> np.ndarray:
         image = (255 * image).astype(np.uint8)
     if image.shape[0] == 3:
         image = einops.rearrange(image, "c h w -> h w c")
-    image = image_tools.resize_with_pad(image, _TARGET_IMAGE_HEIGHT, _TARGET_IMAGE_WIDTH)
     return image
 
 @dataclasses.dataclass(frozen=True)
