@@ -381,7 +381,8 @@ class LeRobotUR5DataConfig(DataConfigFactory):
                 _transforms.RepackTransform(
                     {
                         "observation/exterior_image_1_left": "observation.images.main",
-                        "observation/wrist_image_left": "observation.images.secondary_0",
+                        "observation/wrist_image_left": "observation.images.secondary_1",
+                        "observation/wrist_image_right": "observation.images.secondary_2",
                         "observation/joint_position": "observation.state", # No extra gripper position. Gripper is in the state.
                         "actions": "action",
                         "prompt": "prompt",
@@ -1044,15 +1045,33 @@ _CONFIGS = [
     # UR5 configs.
     #
     TrainConfig(
-        name="pi0_ur5e_lora",
-        model=pi0_config.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=16),
+        name="pi0_ur5e",
+        model=pi0_config.Pi0Config(action_horizon=16),
         data=LeRobotUR5DataConfig(
-            repo_id="F-Fer/ur-1",
+            repo_id="F-Fer/ur-2",
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
             assets=AssetsConfig(
-                asset_id="F-Fer/ur-1"
+                asset_id="F-Fer/ur-2"
+            ),
+            extra_delta_transform=True,
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
+        num_train_steps=30_000,
+        keep_period=1000,
+        batch_size=32,
+    ),
+    TrainConfig(
+        name="pi0_ur5e_lora",
+        model=pi0_config.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=16),
+        data=LeRobotUR5DataConfig(
+            repo_id="F-Fer/ur-2",
+            base_config=DataConfig(
+                prompt_from_task=True,
+            ),
+            assets=AssetsConfig(
+                asset_id="F-Fer/ur-2"
             ),
             extra_delta_transform=True,
         ),
@@ -1069,12 +1088,12 @@ _CONFIGS = [
         name="pi0_ur5e_fast_lora",
         model=pi0_fast.Pi0FASTConfig(action_dim=7, action_horizon=16, max_token_len=90, paligemma_variant="gemma_2b_lora"),
         data=LeRobotUR5DataConfig(
-            repo_id="F-Fer/ur-1",
+            repo_id="F-Fer/ur-2",
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
             assets=AssetsConfig(
-                asset_id="F-Fer/ur-1"
+                asset_id="F-Fer/ur-2"
             ),
             extra_delta_transform=True,
 
@@ -1090,12 +1109,12 @@ _CONFIGS = [
         name="pi05_ur5e_lora",
         model=pi0_config.Pi0Config(pi05=True, paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=16),
         data=LeRobotUR5DataConfig(
-            repo_id="F-Fer/ur-1",
+            repo_id="F-Fer/ur-2",
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
             assets=AssetsConfig(
-                asset_id="F-Fer/ur-1"
+                asset_id="F-Fer/ur-2"
             ),
             extra_delta_transform=True,
         ),

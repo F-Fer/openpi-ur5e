@@ -59,14 +59,15 @@ class UR5EInputs(transforms.DataTransformFn):
                 raise ValueError(f"Unexpected joint/state shape: {joints.shape}")
 
         base_image = _parse_image(data["observation/exterior_image_1_left"])
-        wrist_image = _parse_image(data["observation/wrist_image_left"])
+        wrist_image_left = _parse_image(data["observation/wrist_image_left"])
+        wrist_image_right = _parse_image(data["observation/wrist_image_right"])
 
         names = ("base_0_rgb", "left_wrist_0_rgb", "right_wrist_0_rgb")
-        images = (base_image, wrist_image, np.zeros_like(base_image, dtype=np.uint8))
+        images = (base_image, wrist_image_left, wrist_image_right)
         
         match self.model_type:
             case _model.ModelType.PI0 | _model.ModelType.PI05:
-                image_masks = (np.True_, np.True_, np.False_)
+                image_masks = (np.True_, np.True_, np.True_)
             case _model.ModelType.PI0_FAST:
                 # We don't mask out padding images for FAST models.
                 image_masks = (np.True_, np.True_, np.True_)
