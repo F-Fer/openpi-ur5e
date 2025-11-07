@@ -318,6 +318,7 @@ class PromptFromLeRobotTask(DataTransformFn):
             raise ValueError('Cannot extract prompt without "task_index"')
 
         task_index = int(data["task_index"])
+        print(type(self.tasks))
         if (prompt := self.tasks[task_index]) is None:
             raise ValueError(f"{task_index=} not found in task mapping: {self.tasks}")
 
