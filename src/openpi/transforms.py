@@ -319,7 +319,7 @@ class PromptFromLeRobotTask(DataTransformFn):
 
         task_index = int(data["task_index"])
         print(type(self.tasks))
-        if (prompt := self.tasks[task_index]) is None:
+        if (prompt := self.tasks.iloc[task_index].prompt) is None:
             raise ValueError(f"{task_index=} not found in task mapping: {self.tasks}")
 
         return {**data, "prompt": prompt}
