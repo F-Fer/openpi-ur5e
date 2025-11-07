@@ -1067,7 +1067,7 @@ _CONFIGS = [
         name="pi0_ur5e_lora",
         model=pi0_config.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=16),
         data=LeRobotUR5DataConfig(
-            repo_id="F-Fer/ur-2",
+            repo_id="F-Fer/ur-task3-0",
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
