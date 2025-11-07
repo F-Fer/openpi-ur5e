@@ -119,3 +119,15 @@ def test_extract_prompt_from_task():
 
     with pytest.raises(ValueError, match="task_index=2 not found in task mapping"):
         transform({"task_index": 2})
+
+
+def test_extract_prompt_from_task_dataframe():
+    pd = pytest.importorskip("pandas")
+
+    tasks = pd.DataFrame({"task_index": [0, 1]}, index=["Task zero", "Task one"])
+    transform = _transforms.PromptFromLeRobotTask(tasks)
+
+    assert transform({"task_index": 0})["prompt"] == "Task zero"
+
+    with pytest.raises(ValueError, match="task_index=2 not found in task mapping"):
+        transform({"task_index": 2})
