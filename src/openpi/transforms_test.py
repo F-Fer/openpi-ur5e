@@ -16,6 +16,13 @@ def test_repack_transform():
     assert transform(item) == {"a": {"b": 1}, "d": 2}
 
 
+def test_repack_transform_with_fallback():
+    transform = _transforms.RepackTransform(
+        structure={"a": ("missing", "b")}
+    )
+    assert transform({"b": 1}) == {"a": 1}
+
+
 def test_delta_actions():
     item = {"state": np.array([1, 2, 3]), "actions": np.array([[3, 4, 5], [5, 6, 7]])}
 

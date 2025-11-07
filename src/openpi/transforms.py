@@ -100,7 +100,22 @@ class RepackTransform(DataTransformFn):
 
     def __call__(self, data: DataDict) -> DataDict:
         flat_item = flatten_dict(data)
-        return jax.tree.map(lambda k: flat_item[k], self.structure)
+
+        def lookup(key: str | Sequence[str]) -> DataDict:
+            if isinstance(key, str):
+                candidates = (key,)
+            elif isinstance(key, Sequence):
+                candidates = tuple(key)
+            else:  # pragma: no cover - defensive programming
+                raise TypeError(f"Unsupported key type: {type(key)!r}")
+
+            for candidate in candidates:
+                if candidate in flat_item:
+                    return flat_item[candidate]
+
+            raise KeyError(f"None of the candidate keys {candidates!r} found in item keys {tuple(flat_item)}")
+
+        return jax.tree.map(lookup, self.structure, is_leaf=lambda x: isinstance(x, (str, tuple, list)))
 
 
 @dataclasses.dataclass(frozen=True)

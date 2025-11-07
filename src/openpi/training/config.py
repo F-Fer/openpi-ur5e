@@ -380,12 +380,29 @@ class LeRobotUR5DataConfig(DataConfigFactory):
             inputs=[
                 _transforms.RepackTransform(
                     {
-                        "observation/exterior_image_1_left": "observation.images.main",
-                        "observation/wrist_image_left": "observation.images.secondary_1",
-                        "observation/wrist_image_right": "observation.images.secondary_2",
-                        "observation/joint_position": "observation.state", # No extra gripper position. Gripper is in the state.
-                        "actions": "action",
-                        "prompt": "prompt",
+                        # Base camera image. Support both legacy "main" naming and Lerobot v3 camera ids.
+                        "observation/exterior_image_1_left": (
+                            "observation.images.main",
+                            "observation.images.zed2i_left",
+                        ),
+                        # Wrist cameras (left/right). Fallback to v3 camera ids when available.
+                        "observation/wrist_image_left": (
+                            "observation.images.secondary_1",
+                            "observation.images.zedm_left",
+                        ),
+                        "observation/wrist_image_right": (
+                            "observation.images.secondary_2",
+                            "observation.images.zedm_right",
+                            "observation.images.zed2i_right",
+                        ),
+                        # Proprioceptive state. Some datasets store it directly under observation.state.
+                        "observation/joint_position": (
+                            "observation.state",
+                            "observation.joint_position",
+                        ),  # No extra gripper position. Gripper is in the state.
+                        # Actions/prompt fallbacks.
+                        "actions": ("action", "actions"),
+                        "prompt": ("prompt", "task"),
                     }
                 )
             ]
