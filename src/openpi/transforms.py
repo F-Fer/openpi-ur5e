@@ -318,6 +318,7 @@ class PromptFromLeRobotTask(DataTransformFn):
             raise ValueError('Cannot extract prompt without "task_index"')
 
         task_index = int(data["task_index"])
+        print(self.tasks)
         print(type(self.tasks))
         print(self.tasks.iloc[0])
         print(self.tasks.iloc[task_index, 0])
