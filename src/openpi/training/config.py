@@ -380,12 +380,10 @@ class LeRobotUR5DataConfig(DataConfigFactory):
             inputs=[
                 _transforms.RepackTransform(
                     {
-                        # Base camera image. Support both legacy "main" naming and Lerobot v3 camera ids.
                         "observation/exterior_image_1_left": (
                             "observation.images.main",
                             "observation.images.zed2i_left",
                         ),
-                        # Wrist cameras (left/right). Fallback to v3 camera ids when available.
                         "observation/wrist_image_left": (
                             "observation.images.secondary_1",
                             "observation.images.zedm_left",
@@ -395,12 +393,10 @@ class LeRobotUR5DataConfig(DataConfigFactory):
                             "observation.images.zedm_right",
                             "observation.images.zed2i_right",
                         ),
-                        # Proprioceptive state. Some datasets store it directly under observation.state.
                         "observation/joint_position": (
                             "observation.state",
                             "observation.joint_position",
-                        ),  # No extra gripper position. Gripper is in the state.
-                        # Actions/prompt fallbacks.
+                        ),
                         "actions": ("action", "actions"),
                         "prompt": ("prompt", "task"),
                     }
@@ -1094,7 +1090,7 @@ _CONFIGS = [
             extra_delta_transform=True,
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
-        num_train_steps=10_000,
+        num_train_steps=30_000,
         freeze_filter=pi0_config.Pi0Config(
             paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
         ).get_freeze_filter(),
