@@ -86,17 +86,35 @@ def create_rlds_dataloader(
     return data_loader, num_batches
 
 
-def main(config_name: str, max_frames: int | None = None):
+def main(
+    config_name: str,
+    max_frames: int | None = None,
+    batch_size: int | None = None,
+    num_workers: int | None = None,
+):
     config = _config.get_config(config_name)
+    print(f"Computing norm stats for config: {config.data.repo_id}")
     data_config = config.data.create(config.assets_dirs, config.model)
+    if batch_size is None:
+        batch_size = config.batch_size
+
+    if num_workers is None:
+        num_workers = config.num_workers
+
+    print(f"Computing norm stats with batch_size={batch_size}, num_workers={num_workers}")
 
     if data_config.rlds_data_dir is not None:
         data_loader, num_batches = create_rlds_dataloader(
-            data_config, config.model.action_horizon, config.batch_size, max_frames
+            data_config, config.model.action_horizon, batch_size, max_frames
         )
     else:
         data_loader, num_batches = create_torch_dataloader(
-            data_config, config.model.action_horizon, config.batch_size, config.model, config.num_workers, max_frames
+            data_config,
+            config.model.action_horizon,
+            batch_size,
+            config.model,
+            num_workers,
+            max_frames,
         )
 
     keys = ["state", "actions"]
