@@ -8,7 +8,6 @@ from openpi.models import model as _model
 from openpi.shared import image_tools
 
 logger = logging.getLogger("openpi")
-logger.setLevel(logging.DEBUG)
 
 _TARGET_IMAGE_HEIGHT = 224
 _TARGET_IMAGE_WIDTH = 224
