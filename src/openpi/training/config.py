@@ -1073,7 +1073,7 @@ _CONFIGS = [
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
         num_train_steps=30_000,
-        keep_period=1000,
+        keep_period=5_000,
         batch_size=32, # H100
         num_workers=32, # H100
     ),
@@ -1096,7 +1096,7 @@ _CONFIGS = [
             paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
         ).get_freeze_filter(),
         ema_decay=None,
-        keep_period=1000,
+        keep_period=5_000,
         batch_size=24,
     ),
     #
@@ -1117,7 +1117,7 @@ _CONFIGS = [
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
         num_train_steps=30_000,
-        keep_period=1000,
+        keep_period=5_000,
         batch_size=32, # H100
         num_workers=32, # H100
     ),
@@ -1140,7 +1140,7 @@ _CONFIGS = [
             paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
         ).get_freeze_filter(),
         ema_decay=None,
-        keep_period=1000,
+        keep_period=5_000,
         batch_size=24,
     ),
     #
@@ -1161,7 +1161,7 @@ _CONFIGS = [
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
         num_train_steps=30_000,
-        keep_period=1000,
+        keep_period=5_000,
         batch_size=32, # H100
         num_workers=32, # H100
     ),
@@ -1184,7 +1184,7 @@ _CONFIGS = [
             paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
         ).get_freeze_filter(),
         ema_decay=None,
-        keep_period=1000,
+        keep_period=5_000,
         batch_size=24,
     ),
     #
@@ -1205,7 +1205,7 @@ _CONFIGS = [
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
         num_train_steps=30_000,
-        keep_period=1000,
+        keep_period=5_000,
         batch_size=32, # H100
         num_workers=32, # H100
     ),
@@ -1228,7 +1228,7 @@ _CONFIGS = [
             paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
         ).get_freeze_filter(),
         ema_decay=None,
-        keep_period=1000,
+        keep_period=5_000,
         batch_size=24,
     ),
     #
@@ -1249,7 +1249,7 @@ _CONFIGS = [
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
         num_train_steps=30_000,
-        keep_period=1000,
+        keep_period=5_000,
         batch_size=32, # H100
         num_workers=32, # H100
     ),
@@ -1272,7 +1272,7 @@ _CONFIGS = [
             paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
         ).get_freeze_filter(),
         ema_decay=None,
-        keep_period=1000,
+        keep_period=5_000,
         batch_size=24,
     ),
     #
