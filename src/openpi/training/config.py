@@ -1073,9 +1073,10 @@ _CONFIGS = [
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
         num_train_steps=30_000,
+        save_interval= 5_000,
         keep_period=5_000,
         batch_size=32, # H100
-        num_workers=32, # H100
+        num_workers=28, # H100
     ),
     TrainConfig(
         name="pi0_ur_tasks_merged_lora",
@@ -1117,9 +1118,10 @@ _CONFIGS = [
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
         num_train_steps=30_000,
+        save_interval= 5_000,
         keep_period=5_000,
         batch_size=32, # H100
-        num_workers=32, # H100
+        num_workers=28, # H100
     ),
     TrainConfig(
         name="pi0_ur_task1_lora",
@@ -1161,9 +1163,10 @@ _CONFIGS = [
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
         num_train_steps=30_000,
+        save_interval= 5_000,
         keep_period=5_000,
         batch_size=32, # H100
-        num_workers=32, # H100
+        num_workers=28, # H100
     ),
     TrainConfig(
         name="pi0_ur_task2_lora",
@@ -1205,9 +1208,10 @@ _CONFIGS = [
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
         num_train_steps=30_000,
+        save_interval= 5_000,
         keep_period=5_000,
         batch_size=32, # H100
-        num_workers=32, # H100
+        num_workers=28, # H100
     ),
     TrainConfig(
         name="pi0_ur_task3_lora",
@@ -1249,9 +1253,10 @@ _CONFIGS = [
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
         num_train_steps=30_000,
+        save_interval= 5_000,
         keep_period=5_000,
         batch_size=32, # H100
-        num_workers=32, # H100
+        num_workers=28, # H100
     ),
     TrainConfig(
         name="pi0_ur_task4_lora",
