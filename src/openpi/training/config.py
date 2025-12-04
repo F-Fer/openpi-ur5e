@@ -1075,7 +1075,7 @@ _CONFIGS = [
         num_train_steps=30_000,
         keep_period=5_000,
         batch_size=32, # H100
-        num_workers=15, # H100
+        num_workers=32, # H100
     ),
     TrainConfig(
         name="pi0_ur_tasks_merged_lora",
