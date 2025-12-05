@@ -3,6 +3,7 @@ import http
 import logging
 import time
 import traceback
+import ssl
 
 from openpi_client import base_policy as _base_policy
 from openpi_client import msgpack_numpy
@@ -35,6 +36,11 @@ class WebsocketPolicyServer:
         asyncio.run(self.run())
 
     async def run(self):
+        # <--- NEU: SSL Kontext erstellen --->
+        ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        # Pfad zu den Dateien, die du in Schritt 1 erstellt hast
+        ssl_context.load_cert_chain(certfile="/root/cert.pem", keyfile="/root/key.pem") 
+        # <--- ENDE NEU --->
         async with _server.serve(
             self._handler,
             self._host,
@@ -42,6 +48,7 @@ class WebsocketPolicyServer:
             compression=None,
             max_size=None,
             process_request=_health_check,
+            ssl=ssl_context,
         ) as server:
             await server.serve_forever()
 
