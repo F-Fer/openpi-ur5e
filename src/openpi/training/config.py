@@ -1100,6 +1100,7 @@ _CONFIGS = [
         keep_period=5_000,
         save_interval= 5_000,
         batch_size=24,
+        num_workers=7,
     ),
     #
     # UR5 task1
