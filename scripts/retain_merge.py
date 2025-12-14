@@ -1,7 +1,14 @@
+"""
+Example usage:
+python scripts/retain_merge.py --args.base-checkpoint gs://openpi-assets/checkpoints/pi0_base/params --args.finetuned-checkpoint /root/.cache/huggingface/hub/models--F-Fer-
+-tasks-merged/snapshots/c96dae45d8a991b936b5fa6d67366759e7da8a09/59999/params/ --args.output-dir ./checkpoints/pi0_ur_tasks_merged_retain_0.5/params --args.alpha 0.5 --args
+"""
+
 
 import dataclasses
 import logging
 import pathlib
+import shutil
 
 import jax
 import numpy as np
@@ -22,7 +29,7 @@ class Args:
 
     # Path or URL to the base model checkpoint.
     # Example: "gs://openpi-assets/checkpoints/pi0_base/params"
-    base_checkpoint: str = "gs://openpi-assets/checkpoints/pi0_base/params"
+    base_checkpoint: str 
 
     # Path or URL to the finetuned model checkpoint.
     # Example: "./checkpoints/pi0_ur_tasks_merged/<exp>/<step>/params"
@@ -95,8 +102,32 @@ def main(args: Args):
     checkpointer = ocp.PyTreeCheckpointer()
     checkpointer.save(
         args.output_dir.resolve(), 
-        {"params": merged_params}
+        {"params": merged_params},
+        force=args.overwrite
     )
+
+    # Attempt to copy assets (e.g. norm_stats) from the finetuned checkpoint
+    ft_local_path = download.maybe_download(args.finetuned_checkpoint)
+    src_assets = ft_local_path.parent / "assets" if ft_local_path.name == "params" else ft_local_path / "assets"
+    
+    if src_assets.exists():
+        dest_assets = args.output_dir.parent / "assets" if args.output_dir.name == "params" else args.output_dir / "assets"
+        
+        should_copy = True
+        if dest_assets.exists():
+            if args.overwrite:
+                logger.info(f"Overwriting assets at {dest_assets}...")
+                shutil.rmtree(dest_assets)
+            else:
+                logger.warning(f"Assets directory {dest_assets} already exists. Skipping copy.")
+                should_copy = False
+        
+        if should_copy:
+            logger.info(f"Copying assets from {src_assets} to {dest_assets}...")
+            # symlinks=False ensures we copy the actual files, not links
+            shutil.copytree(src_assets, dest_assets, symlinks=False)
+    else:
+        logger.info(f"No assets found at {src_assets}. Skipping assets copy.")
     
     logger.info("Done!")
     logger.info(f"Merged model saved to: {args.output_dir}")
