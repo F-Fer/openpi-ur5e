@@ -81,6 +81,7 @@ def main(args: Args):
     if args.output_dir.exists():
         if args.overwrite:
             logger.info(f"Output directory {args.output_dir} exists. Overwriting...")
+            shutil.rmtree(args.output_dir)
         else:
             raise FileExistsError(
                 f"Output directory {args.output_dir} already exists. Use --overwrite to replace it."
