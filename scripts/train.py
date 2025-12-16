@@ -1,3 +1,4 @@
+import contextlib
 import dataclasses
 import functools
 import logging
@@ -26,6 +27,68 @@ import openpi.training.optimizer as _optimizer
 import openpi.training.sharding as sharding
 import openpi.training.utils as training_utils
 import openpi.training.weight_loaders as _weight_loaders
+
+
+def _tree_numel(tree: Any) -> int:
+    leaves = jax.tree_util.tree_leaves(tree)
+    total = 0
+    for x in leaves:
+        if hasattr(x, "size"):
+            total += int(x.size)
+    return total
+
+
+def _tree_nbytes(tree: Any) -> int:
+    leaves = jax.tree_util.tree_leaves(tree)
+    total = 0
+    for x in leaves:
+        if hasattr(x, "size") and hasattr(x, "dtype"):
+            total += int(x.size) * int(np.dtype(x.dtype).itemsize)
+    return total
+
+
+def _format_bytes(n: int) -> str:
+    # binary units, matches how GPU memory is usually discussed
+    for unit, div in [("GiB", 1024**3), ("MiB", 1024**2), ("KiB", 1024)]:
+        if n >= div:
+            return f"{n / div:.2f} {unit}"
+    return f"{n} B"
+
+
+def _log_param_and_memory_summary(config: _config.TrainConfig, state: training_utils.TrainState) -> None:
+    # Params live inside nnx.State; convert to pure dicts for reliable tree traversal.
+    all_params = state.params.filter(nnx.Param).to_pure_dict()
+    trainable_params = state.params.filter(config.trainable_filter).to_pure_dict()
+    frozen_params = state.params.filter(nnx.All(nnx.Param, config.freeze_filter)).to_pure_dict()
+
+    total_params = _tree_numel(all_params)
+    trainable = _tree_numel(trainable_params)
+    frozen = _tree_numel(frozen_params)
+
+    total_bytes = _tree_nbytes(all_params)
+    trainable_bytes = _tree_nbytes(trainable_params)
+    frozen_bytes = _tree_nbytes(frozen_params)
+
+    opt_bytes = _tree_nbytes(state.opt_state)
+    ema_bytes = 0 if state.ema_params is None else _tree_nbytes(state.ema_params.to_pure_dict())
+
+    pct = 0.0 if total_params == 0 else (100.0 * trainable / total_params)
+    logging.info(
+        "Parameter summary: total=%s, trainable=%s (%.2f%%), frozen=%s",
+        f"{total_params:,}",
+        f"{trainable:,}",
+        pct,
+        f"{frozen:,}",
+    )
+    logging.info(
+        "Memory (params only): total=%s, trainable=%s, frozen=%s",
+        _format_bytes(total_bytes),
+        _format_bytes(trainable_bytes),
+        _format_bytes(frozen_bytes),
+    )
+    logging.info("Memory (optimizer state): %s", _format_bytes(opt_bytes))
+    if state.ema_decay is not None:
+        logging.info("Memory (EMA params): %s (ema_decay=%s)", _format_bytes(ema_bytes), state.ema_decay)
 
 
 def init_logging():
@@ -209,6 +272,29 @@ def main(config: _config.TrainConfig):
     data_sharding = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec(sharding.DATA_AXIS))
     replicated_sharding = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec())
 
+    if config.report_only:
+        # Report param counts / bytes without touching datasets/checkpoints.
+        tx = _optimizer.create_optimizer(config.optimizer, config.lr_schedule, weight_decay_mask=None)
+        with sharding.set_mesh(mesh):
+            model = config.model.create(init_rng)
+            params = nnx.state(model)
+            params = nnx_utils.state_map(
+                params, config.freeze_filter, lambda p: p.replace(p.value.astype(jnp.bfloat16))
+            )
+            train_state = training_utils.TrainState(
+                step=0,
+                params=params,
+                model_def=nnx.graphdef(model),
+                tx=tx,
+                opt_state=tx.init(params.filter(config.trainable_filter)),
+                ema_decay=config.ema_decay,
+                ema_params=None if config.ema_decay is None else params,
+            )
+        _log_param_and_memory_summary(config, train_state)
+        with contextlib.suppress(Exception):
+            logging.info("Device memory stats: %s", jax.devices()[0].memory_stats())
+        return
+
     checkpoint_manager, resuming = _checkpoints.initialize_checkpoint_dir(
         config.checkpoint_dir,
         keep_period=config.keep_period,
@@ -236,6 +322,7 @@ def main(config: _config.TrainConfig):
     train_state, train_state_sharding = init_train_state(config, init_rng, mesh, resume=resuming)
     jax.block_until_ready(train_state)
     logging.info(f"Initialized train state:\n{training_utils.array_tree_to_info(train_state.params)}")
+    _log_param_and_memory_summary(config, train_state)
 
     if resuming:
         train_state = _checkpoints.restore_state(checkpoint_manager, train_state, data_loader)

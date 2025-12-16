@@ -25,7 +25,7 @@ class Args:
 
     # Path or URL to the base model checkpoint.
     # Example: "gs://openpi-assets/checkpoints/pi0_base/params"
-    base_checkpoint: str 
+    base_checkpoint: str
 
     # Path or URL to the finetuned model checkpoint.
     # Example: "./checkpoints/pi0_ur_tasks_merged/<exp>/<step>/params"
