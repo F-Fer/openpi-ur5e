@@ -290,6 +290,7 @@ def main(config: _config.TrainConfig):
                 ema_decay=config.ema_decay,
                 ema_params=None if config.ema_decay is None else params,
             )
+        jax.block_until_ready(train_state)
         _log_param_and_memory_summary(config, train_state)
         with contextlib.suppress(Exception):
             logging.info("Device memory stats: %s", jax.devices()[0].memory_stats())
