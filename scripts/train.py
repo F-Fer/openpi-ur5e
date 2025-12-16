@@ -1,6 +1,7 @@
 import contextlib
 import dataclasses
 import functools
+import gc
 import logging
 import platform
 from typing import Any
@@ -281,6 +282,10 @@ def main(config: _config.TrainConfig):
             params = nnx_utils.state_map(
                 params, config.freeze_filter, lambda p: p.replace(p.value.astype(jnp.bfloat16))
             )
+            # Important: update the model in-place so we don't keep both the original (e.g. f32)
+            # and casted (e.g. bf16) copies of frozen params alive at the same time.
+            nnx.update(model, params)
+            params = nnx.state(model)
             train_state = training_utils.TrainState(
                 step=0,
                 params=params,
@@ -291,6 +296,10 @@ def main(config: _config.TrainConfig):
                 ema_params=None if config.ema_decay is None else params,
             )
         jax.block_until_ready(train_state)
+        # Drop temporary references and let device buffers get freed before reading memory stats.
+        del model
+        del params
+        gc.collect()
         _log_param_and_memory_summary(config, train_state)
         with contextlib.suppress(Exception):
             logging.info("Device memory stats: %s", jax.devices()[0].memory_stats())
