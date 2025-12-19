@@ -1,4 +1,8 @@
-# openpi
+# openpi-ur5e
+
+> [!IMPORTANT]
+> This repository is a fork of the original [openpi](https://github.com/Physical-Intelligence/openpi) repository by Physical Intelligence. 
+> It has been adapted for a bachelor thesis project. For the main robot control and data collection setup, see the [lerobot_ur5e_gello](https://github.com/F-Fer/lerobot_ur5e_gello) repository.
 
 openpi holds open-source models and packages for robotics, published by the [Physical Intelligence team](https://www.physicalintelligence.company/).
 
@@ -36,7 +40,7 @@ The repo has been tested with Ubuntu 22.04, we do not currently support other op
 When cloning this repo, make sure to update submodules:
 
 ```bash
-git clone --recurse-submodules git@github.com:Physical-Intelligence/openpi.git
+git clone --recurse-submodules git@github.com:F-Fer/openpi-ur5e.git
 
 # Or if you already cloned the repo:
 git submodule update --init --recursive
