@@ -364,7 +364,7 @@ class LeRobotUR5DataConfig(DataConfigFactory):
     """
 
     extra_delta_transform: bool = False
-    action_sequence_keys: Sequence[str] = ("action",) 
+    action_sequence_keys: Sequence[str] = ("action",)
 
     @override
     def create(self, assets_dirs: pathlib.Path, model_config: _model.BaseModelConfig) -> DataConfig:
@@ -606,6 +606,9 @@ class TrainConfig:
     overwrite: bool = False
     # If true, will resume training from the last checkpoint.
     resume: bool = False
+    # If true, will only build the model/optimizer and print parameter + memory summary,
+    # skipping dataset loading, checkpointing, and training.
+    report_only: bool = False
 
     # If true, will enable wandb logging.
     wandb_enabled: bool = True
@@ -1054,7 +1057,6 @@ _CONFIGS = [
     # RoboArena configs.
     #
     *roboarena_config.get_roboarena_configs(),
-
     #
     # UR5 tasks merged
     #
@@ -1066,39 +1068,39 @@ _CONFIGS = [
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
-            assets=AssetsConfig(
-                asset_id="F-Fer/ur-tasks-merged"
-            ),
+            assets=AssetsConfig(asset_id="F-Fer/ur-tasks-merged"),
             extra_delta_transform=True,
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
-        num_train_steps=30_000,
-        save_interval= 5_000,
+        num_train_steps=60_000,
+        save_interval=5_000,
         keep_period=5_000,
-        batch_size=32, # H100
-        num_workers=28, # H100
+        batch_size=32,  # H100
+        num_workers=28,  # H100
     ),
     TrainConfig(
         name="pi0_ur_tasks_merged_lora",
-        model=pi0_config.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=30),
+        model=pi0_config.Pi0Config(
+            paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=30
+        ),
         data=LeRobotUR5DataConfig(
             repo_id="F-Fer/ur-tasks-merged",
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
-            assets=AssetsConfig(
-                asset_id="F-Fer/ur-tasks-merged"
-            ),
+            assets=AssetsConfig(asset_id="F-Fer/ur-tasks-merged"),
             extra_delta_transform=True,
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
-        num_train_steps=30_000,
+        num_train_steps=60_000,
         freeze_filter=pi0_config.Pi0Config(
             paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
         ).get_freeze_filter(),
         ema_decay=None,
         keep_period=5_000,
+        save_interval=5_000,
         batch_size=24,
+        num_workers=7,
     ),
     #
     # UR5 task1
@@ -1111,29 +1113,27 @@ _CONFIGS = [
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
-            assets=AssetsConfig(
-                asset_id="F-Fer/ur-tasks-merged"
-            ),
+            assets=AssetsConfig(asset_id="F-Fer/ur-tasks-merged"),
             extra_delta_transform=True,
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
         num_train_steps=30_000,
-        save_interval= 5_000,
+        save_interval=5_000,
         keep_period=5_000,
-        batch_size=32, # H100
-        num_workers=28, # H100
+        batch_size=32,  # H100
+        num_workers=28,  # H100
     ),
     TrainConfig(
         name="pi0_ur_task1_lora",
-        model=pi0_config.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=30),
+        model=pi0_config.Pi0Config(
+            paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=30
+        ),
         data=LeRobotUR5DataConfig(
             repo_id="F-Fer/ur-task1",
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
-            assets=AssetsConfig(
-                asset_id="F-Fer/ur-tasks-merged"
-            ),
+            assets=AssetsConfig(asset_id="F-Fer/ur-tasks-merged"),
             extra_delta_transform=True,
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
@@ -1156,29 +1156,27 @@ _CONFIGS = [
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
-            assets=AssetsConfig(
-                asset_id="F-Fer/ur-tasks-merged"
-            ),
+            assets=AssetsConfig(asset_id="F-Fer/ur-tasks-merged"),
             extra_delta_transform=True,
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
         num_train_steps=30_000,
-        save_interval= 5_000,
+        save_interval=5_000,
         keep_period=5_000,
-        batch_size=32, # H100
-        num_workers=28, # H100
+        batch_size=32,  # H100
+        num_workers=28,  # H100
     ),
     TrainConfig(
         name="pi0_ur_task2_lora",
-        model=pi0_config.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=30),
+        model=pi0_config.Pi0Config(
+            paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=30
+        ),
         data=LeRobotUR5DataConfig(
             repo_id="F-Fer/ur-task2",
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
-            assets=AssetsConfig(
-                asset_id="F-Fer/ur-tasks-merged"
-            ),
+            assets=AssetsConfig(asset_id="F-Fer/ur-tasks-merged"),
             extra_delta_transform=True,
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
@@ -1201,29 +1199,27 @@ _CONFIGS = [
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
-            assets=AssetsConfig(
-                asset_id="F-Fer/ur-tasks-merged"
-            ),
+            assets=AssetsConfig(asset_id="F-Fer/ur-tasks-merged"),
             extra_delta_transform=True,
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
         num_train_steps=30_000,
-        save_interval= 5_000,
+        save_interval=5_000,
         keep_period=5_000,
-        batch_size=32, # H100
-        num_workers=28, # H100
+        batch_size=32,  # H100
+        num_workers=28,  # H100
     ),
     TrainConfig(
         name="pi0_ur_task3_lora",
-        model=pi0_config.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=30),
+        model=pi0_config.Pi0Config(
+            paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=30
+        ),
         data=LeRobotUR5DataConfig(
             repo_id="F-Fer/ur-task3",
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
-            assets=AssetsConfig(
-                asset_id="F-Fer/ur-tasks-merged"
-            ),
+            assets=AssetsConfig(asset_id="F-Fer/ur-tasks-merged"),
             extra_delta_transform=True,
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
@@ -1246,29 +1242,27 @@ _CONFIGS = [
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
-            assets=AssetsConfig(
-                asset_id="F-Fer/ur-tasks-merged"
-            ),
+            assets=AssetsConfig(asset_id="F-Fer/ur-tasks-merged"),
             extra_delta_transform=True,
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
         num_train_steps=30_000,
-        save_interval= 5_000,
+        save_interval=5_000,
         keep_period=5_000,
-        batch_size=32, # H100
-        num_workers=28, # H100
+        batch_size=32,  # H100
+        num_workers=28,  # H100
     ),
     TrainConfig(
         name="pi0_ur_task4_lora",
-        model=pi0_config.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=30),
+        model=pi0_config.Pi0Config(
+            paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=30
+        ),
         data=LeRobotUR5DataConfig(
             repo_id="F-Fer/ur-task4",
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
-            assets=AssetsConfig(
-                asset_id="F-Fer/ur-tasks-merged"
-            ),
+            assets=AssetsConfig(asset_id="F-Fer/ur-tasks-merged"),
             extra_delta_transform=True,
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
@@ -1285,21 +1279,22 @@ _CONFIGS = [
     #
     TrainConfig(
         name="pi0_ur5e_fast_lora",
-        model=pi0_fast.Pi0FASTConfig(action_dim=7, action_horizon=30, max_token_len=90, paligemma_variant="gemma_2b_lora"),
+        model=pi0_fast.Pi0FASTConfig(
+            action_dim=7, action_horizon=30, max_token_len=90, paligemma_variant="gemma_2b_lora"
+        ),
         data=LeRobotUR5DataConfig(
             repo_id="F-Fer/ur-2",
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
-            assets=AssetsConfig(
-                asset_id="F-Fer/ur-2"
-            ),
+            assets=AssetsConfig(asset_id="F-Fer/ur-2"),
             extra_delta_transform=True,
-
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_fast_base/params"),
         num_train_steps=30_000,
-        freeze_filter=pi0_fast.Pi0FASTConfig(action_dim=7, action_horizon=30, max_token_len=90, paligemma_variant="gemma_2b_lora").get_freeze_filter(),
+        freeze_filter=pi0_fast.Pi0FASTConfig(
+            action_dim=7, action_horizon=30, max_token_len=90, paligemma_variant="gemma_2b_lora"
+        ).get_freeze_filter(),
         ema_decay=None,
         batch_size=24,
         keep_period=1000,
@@ -1309,20 +1304,22 @@ _CONFIGS = [
     #
     TrainConfig(
         name="pi05_ur5e_lora",
-        model=pi0_config.Pi0Config(pi05=True, paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=30),
+        model=pi0_config.Pi0Config(
+            pi05=True, paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=30
+        ),
         data=LeRobotUR5DataConfig(
             repo_id="F-Fer/ur-2",
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
-            assets=AssetsConfig(
-                asset_id="F-Fer/ur-2"
-            ),
+            assets=AssetsConfig(asset_id="F-Fer/ur-2"),
             extra_delta_transform=True,
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_base/params"),
         num_train_steps=10_000,
-        freeze_filter=pi0_config.Pi0Config(pi05=True, paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=30).get_freeze_filter(),
+        freeze_filter=pi0_config.Pi0Config(
+            pi05=True, paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=30
+        ).get_freeze_filter(),
         ema_decay=None,
         keep_period=1000,
         batch_size=24,
