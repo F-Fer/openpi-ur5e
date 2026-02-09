@@ -68,7 +68,13 @@ class Pi0(_model.BaseModel):
         super().__init__(config.action_dim, config.action_horizon, config.max_token_len)
         self.pi05 = config.pi05
         paligemma_config = _gemma.get_config(config.paligemma_variant)
+        paligemma_config = _gemma.override_lora_config(
+            paligemma_config, config.paligemma_lora_rank, config.paligemma_lora_alpha
+        )
         action_expert_config = _gemma.get_config(config.action_expert_variant)
+        action_expert_config = _gemma.override_lora_config(
+            action_expert_config, config.action_expert_lora_rank, config.action_expert_lora_alpha
+        )
         # TODO: rewrite gemma in NNX. For now, use bridge.
         llm = nnx_bridge.ToNNX(
             _gemma.Module(

@@ -73,6 +73,26 @@ def get_config(variant):
     raise ValueError(f"Unknown variant: {variant}")
 
 
+def override_lora_config(config, rank: int | None = None, alpha: float | None = None):
+    """Override the LoRA rank and/or alpha on an existing config dict. No-op if the config has no LoRA."""
+    lora_configs = config.get("lora_configs")
+    if not lora_configs or (rank is None and alpha is None):
+        return config
+    new_lora_configs = {}
+    for key, lc in lora_configs.items():
+        new_lora_configs[key] = lora.LoRAConfig(
+            rank=rank if rank is not None else lc.rank,
+            alpha=alpha if alpha is not None else lc.alpha,
+            init_fn=lc.init_fn,
+            rslora=lc.rslora,
+            axes=lc.axes,
+            label=lc.label,
+        )
+    config = config.copy_and_resolve_references()
+    config.lora_configs = new_lora_configs
+    return config
+
+
 @at.typecheck
 class Einsum(nn.Module):
     shape: tuple[int, ...]

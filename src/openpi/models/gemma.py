@@ -109,6 +109,23 @@ def get_config(variant: Variant) -> Config:
     raise ValueError(f"Unknown variant: {variant}")
 
 
+def override_lora_config(config: Config, rank: int | None = None, alpha: float | None = None) -> Config:
+    """Override the LoRA rank and/or alpha on an existing Config. No-op if the config has no LoRA."""
+    if not config.lora_configs or (rank is None and alpha is None):
+        return config
+    new_lora_configs = {}
+    for key, lc in config.lora_configs.items():
+        new_lora_configs[key] = lora.LoRAConfig(
+            rank=rank if rank is not None else lc.rank,
+            alpha=alpha if alpha is not None else lc.alpha,
+            init_fn=lc.init_fn,
+            rslora=lc.rslora,
+            axes=lc.axes,
+            label=lc.label,
+        )
+    return dataclasses.replace(config, lora_configs=new_lora_configs)
+
+
 @at.typecheck
 class RMSNorm(nn.Module):
     @nn.compact

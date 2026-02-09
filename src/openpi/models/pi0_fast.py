@@ -77,6 +77,9 @@ def put_along_last_axis(arr, indices, values):
 class Pi0FASTConfig(_model.BaseModelConfig):
     dtype: str = "bfloat16"
     paligemma_variant: _gemma.Variant = "gemma_2b"
+    # Optional overrides for LoRA rank/alpha. Only applied when the variant includes LoRA.
+    paligemma_lora_rank: int | None = None
+    paligemma_lora_alpha: float | None = None
 
     # Set the model specific defaults.
     action_dim: int = 32
@@ -135,6 +138,9 @@ class Pi0FAST(_model.BaseModel):
     def __init__(self, config: Pi0FASTConfig, rngs: nnx.Rngs):
         super().__init__(config.action_dim, config.action_horizon, config.max_token_len)
         paligemma_config = _gemma.get_config(config.paligemma_variant)
+        paligemma_config = _gemma.override_lora_config(
+            paligemma_config, config.paligemma_lora_rank, config.paligemma_lora_alpha
+        )
         # TODO: rewrite gemma in NNX. For now, use bridge.
         llm = nnx_bridge.ToNNX(
             _gemma.Module(
