@@ -1103,6 +1103,27 @@ _CONFIGS = [
         num_workers=7,
     ),
     #
+    # UR5 zero-shot
+    #
+    TrainConfig(
+        name="pi0_ur_zero_shot",
+        model=pi0_config.Pi0Config(action_horizon=30),
+        data=LeRobotUR5DataConfig(
+            repo_id="F-Fer/ur-tasks-merged",
+            base_config=DataConfig(
+                prompt_from_task=True,
+            ),
+            assets=AssetsConfig(asset_id="F-Fer/ur-tasks-merged"),
+            extra_delta_transform=True,
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
+        num_train_steps=30_000,
+        save_interval=5_000,
+        keep_period=5_000,
+        batch_size=32,  # H100
+        num_workers=28,  # H100
+    ),
+    #
     # UR5 task1
     #
     TrainConfig(
