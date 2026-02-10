@@ -18,7 +18,9 @@ fi
 # Attempt to log into Hugging Face using either HUGGINGFACE_HUB_TOKEN or HUGGINGFACE_TOKEN.
 HF_TOKEN="${HUGGINGFACE_HUB_TOKEN:-${HUGGINGFACE_TOKEN:-}}"
 if [ -n "$HF_TOKEN" ]; then
-    uv run huggingface-cli login --token "$HF_TOKEN" --add-to-git-credential
+    if ! uv run huggingface-cli login --token "$HF_TOKEN" --add-to-git-credential >/dev/null 2>&1; then
+        echo "[startup] Warning: Hugging Face login failed." >&2
+    fi
 fi
 
 # Generate SSL certificate
