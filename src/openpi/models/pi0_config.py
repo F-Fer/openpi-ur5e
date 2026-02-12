@@ -92,8 +92,12 @@ class Pi0Config(_model.BaseModelConfig):
         gemma_params_filter = nnx_utils.PathRegex(".*llm.*")
         action_expert_params_filter = nnx_utils.PathRegex(".*llm.*_1.*")
         if self.freeze_paligemma and "lora" not in self.paligemma_variant and "lora" not in self.action_expert_variant:
-            # Freeze all LLM params except the action expert (expert 1).
-            return nnx.All(gemma_params_filter, nnx.Not(action_expert_params_filter))
+            # Freeze all LLM and vision encoder params except the action expert (expert 1)
+            img_params_filter = nnx_utils.PathRegex(".*img.*")
+            return nnx.Any(
+                nnx.All(gemma_params_filter, nnx.Not(action_expert_params_filter)),
+                img_params_filter,
+            )
         if "lora" in self.paligemma_variant:
             filters.append(
                 gemma_params_filter,
