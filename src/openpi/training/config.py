@@ -1388,7 +1388,29 @@ _CONFIGS = [
         ema_decay=None,
         keep_period=10_000,
         batch_size=24,
-    )
+    ),
+    #
+    # Freeze paligemma ablation study, keep action expert unfrozen (FFT)
+    #
+    TrainConfig(
+        name="pi0_ur_tasks_merged_freeze_paligemma",
+        model=pi0_config.Pi0Config(action_horizon=30, freeze_paligemma=True),
+        data=LeRobotUR5DataConfig(
+            repo_id="F-Fer/ur-task1",
+            base_config=DataConfig(
+                prompt_from_task=True,
+            ),
+            assets=AssetsConfig(asset_id="F-Fer/ur-tasks-merged"),
+            extra_delta_transform=True,
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
+        num_train_steps=60_000,
+        freeze_filter=pi0_config.Pi0Config(freeze_paligemma=True).get_freeze_filter(),
+        ema_decay=None,
+        save_interval=10_000,
+        keep_period=10_000,
+        batch_size=24,
+    ),
 ]
 
 if len({config.name for config in _CONFIGS}) != len(_CONFIGS):
