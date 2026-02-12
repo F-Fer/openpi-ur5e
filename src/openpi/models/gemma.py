@@ -27,6 +27,7 @@ We follow this einsum axis naming convention:
 
 from collections.abc import Sequence
 import dataclasses
+import logging
 from typing import Literal, TypeAlias
 
 import einops
@@ -115,9 +116,12 @@ def override_lora_config(config: Config, rank: int | None = None, alpha: float |
         return config
     new_lora_configs = {}
     for key, lc in config.lora_configs.items():
+        new_rank = rank if rank is not None else lc.rank
+        new_alpha = alpha if alpha is not None else lc.alpha
+        logging.info(f"LoRA override [{key}]: rank {lc.rank} -> {new_rank}, alpha {lc.alpha} -> {new_alpha}")
         new_lora_configs[key] = lora.LoRAConfig(
-            rank=rank if rank is not None else lc.rank,
-            alpha=alpha if alpha is not None else lc.alpha,
+            rank=new_rank,
+            alpha=new_alpha,
             init_fn=lc.init_fn,
             rslora=lc.rslora,
             axes=lc.axes,
