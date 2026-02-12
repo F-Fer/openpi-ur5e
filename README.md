@@ -337,3 +337,10 @@ We will collect common issues and their solutions here. If you encounter an issu
         --policy.config=pi0_ur_zero_shot \
         --policy.dir=gs://openpi-assets/checkpoints/pi0_base
     ```
+
+## Tasks
+
+1. Pick up the M10 bolt and insert it into the hole until fully seated.
+2. Pick up the M10 bolt and insert it into the hex recess until seated.
+3. Pick up the M10 bolt from the tray and put it into the blue bin.
+4. Pick up the bearing and press it into the housing until flush.
