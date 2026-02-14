@@ -37,12 +37,21 @@ chmod 644 /root/cert.pem
 
 cd /workspace
 
+# Build Jupyter auth flags from JUPYTER_PASSWORD env var.
+if [ -n "${JUPYTER_PASSWORD:-}" ]; then
+    HASHED_PW=$(uv run python -c "from jupyter_server.auth import passwd; print(passwd('${JUPYTER_PASSWORD}'))")
+    JUPYTER_AUTH_ARGS="--ServerApp.token='' --ServerApp.password='${HASHED_PW}'"
+    echo "[startup] Jupyter password protection enabled."
+else
+    JUPYTER_AUTH_ARGS="--ServerApp.token='' --ServerApp.password=''"
+    echo "[startup] WARNING: No JUPYTER_PASSWORD set — Jupyter is running without authentication!" >&2
+fi
+
 uv run jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root \
     --ServerApp.allow_origin='*' \
     --ServerApp.allow_remote_access=True \
     --ServerApp.disable_check_xsrf=True \
     --ServerApp.root_dir=/workspace \
-    --NotebookApp.token="" \
-    --NotebookApp.password="" &
+    $JUPYTER_AUTH_ARGS &
 
 sleep infinity

@@ -20,6 +20,15 @@ class Pi0Config(_model.BaseModelConfig):
     dtype: str = "bfloat16"
     paligemma_variant: _gemma.Variant = "gemma_2b"
     action_expert_variant: _gemma.Variant = "gemma_300m"
+    # Optional overrides for LoRA rank/alpha. Only applied when the variant includes LoRA.
+    paligemma_lora_rank: int | None = None
+    paligemma_lora_alpha: float | None = None
+    action_expert_lora_rank: int | None = None
+    action_expert_lora_alpha: float | None = None
+    # If true, freeze the paligemma backbone (expert 0) while fully fine-tuning the action expert (expert 1).
+    # This is a middle ground between full fine-tuning and LoRA: cheaper than full fine-tuning but more
+    # expressive than LoRA on the action expert. Should not be used together with LoRA variants.
+    freeze_paligemma: bool = False
 
     # Set the model specific defaults.
     action_dim: int = 32
@@ -82,6 +91,13 @@ class Pi0Config(_model.BaseModelConfig):
         has_lora = False
         gemma_params_filter = nnx_utils.PathRegex(".*llm.*")
         action_expert_params_filter = nnx_utils.PathRegex(".*llm.*_1.*")
+        if self.freeze_paligemma and "lora" not in self.paligemma_variant and "lora" not in self.action_expert_variant:
+            # Freeze all LLM and vision encoder params except the action expert (expert 1)
+            img_params_filter = nnx_utils.PathRegex(".*img.*")
+            return nnx.Any(
+                nnx.All(gemma_params_filter, nnx.Not(action_expert_params_filter)),
+                img_params_filter,
+            )
         if "lora" in self.paligemma_variant:
             filters.append(
                 gemma_params_filter,
