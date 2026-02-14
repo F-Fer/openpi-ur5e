@@ -12,6 +12,7 @@ services:
       - HF_HOME=/workspace/.cache/huggingface
       - WANDB_API_KEY=${WANDB_API_KEY:-}
       - HUGGINGFACE_HUB_TOKEN=${HUGGINGFACE_HUB_TOKEN:-}
+      - JUPYTER_PASSWORD=${JUPYTER_PASSWORD:-}
     volumes:
       - ./checkpoints:/workspace/checkpoints
       - ./assets:/workspace/assets
