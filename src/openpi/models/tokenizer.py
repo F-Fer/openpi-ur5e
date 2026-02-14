@@ -5,19 +5,35 @@ import jax
 import numpy as np
 import orbax.checkpoint as ocp
 import sentencepiece
+from huggingface_hub import hf_hub_download
 from transformers import AutoProcessor
 
 import openpi.models.utils.fsq_tokenizer as fsq_tokenizer
 import openpi.shared.download as download
+
+_PALIGEMMA_HF_REPO = "google/paligemma-3b-pt-224"
+_PALIGEMMA_TOKENIZER_FILE = "tokenizer.model"
+
+
+def _load_paligemma_tokenizer() -> sentencepiece.SentencePieceProcessor:
+    """Download and load the PaliGemma SentencePiece tokenizer from HuggingFace."""
+    try:
+        path = hf_hub_download(repo_id=_PALIGEMMA_HF_REPO, filename=_PALIGEMMA_TOKENIZER_FILE)
+    except Exception as e:
+        raise RuntimeError(
+            f"Failed to download PaliGemma tokenizer from HuggingFace ({_PALIGEMMA_HF_REPO}). "
+            f"This is a gated model — accept the license at https://huggingface.co/{_PALIGEMMA_HF_REPO} "
+            f"and set HF_TOKEN or run `huggingface-cli login`."
+        ) from e
+    with open(path, "rb") as f:
+        return sentencepiece.SentencePieceProcessor(model_proto=f.read())
 
 
 class PaligemmaTokenizer:
     def __init__(self, max_len: int = 48):
         self._max_len = max_len
 
-        path = download.maybe_download("gs://big_vision/paligemma_tokenizer.model", gs={"token": "anon"})
-        with path.open("rb") as f:
-            self._tokenizer = sentencepiece.SentencePieceProcessor(model_proto=f.read())
+        self._tokenizer = _load_paligemma_tokenizer()
 
     def tokenize(self, prompt: str, state: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray]:
         cleaned_text = prompt.strip().replace("_", " ").replace("\n", " ")
@@ -53,9 +69,7 @@ class FASTTokenizer:
         self._max_len = max_len
 
         # Download base PaliGemma tokenizer
-        path = download.maybe_download("gs://big_vision/paligemma_tokenizer.model", gs={"token": "anon"})
-        with path.open("rb") as f:
-            self._paligemma_tokenizer = sentencepiece.SentencePieceProcessor(model_proto=f.read())
+        self._paligemma_tokenizer = _load_paligemma_tokenizer()
 
         # Instantiate FAST tokenizer
         self._fast_tokenizer = AutoProcessor.from_pretrained(fast_tokenizer_path, trust_remote_code=True)
@@ -155,9 +169,7 @@ class BinningTokenizer:
         self._n_bins = n_bins
 
         # Download base PaliGemma tokenizer
-        path = download.maybe_download("gs://big_vision/paligemma_tokenizer.model", gs={"token": "anon"})
-        with path.open("rb") as f:
-            self._paligemma_tokenizer = sentencepiece.SentencePieceProcessor(model_proto=f.read())
+        self._paligemma_tokenizer = _load_paligemma_tokenizer()
 
         self._fast_skip_tokens = 128  # Skip last 128 tokens in PaliGemma vocab since they are special tokens
 
@@ -291,9 +303,7 @@ class FSQTokenizer:
         )
 
         # Download base PaliGemma tokenizer
-        path = download.maybe_download("gs://big_vision/paligemma_tokenizer.model", gs={"token": "anon"})
-        with path.open("rb") as f:
-            self._paligemma_tokenizer = sentencepiece.SentencePieceProcessor(model_proto=f.read())
+        self._paligemma_tokenizer = _load_paligemma_tokenizer()
 
         self._fast_skip_tokens = 128  # Skip last 128 tokens in PaliGemma vocab since they are special tokens
 

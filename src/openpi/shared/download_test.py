@@ -42,13 +42,3 @@ def test_download_gs():
 
     new_local_path = download.maybe_download(remote_path)
     assert new_local_path == local_path
-
-
-def test_download_fsspec():
-    remote_path = "gs://big_vision/paligemma_tokenizer.model"
-
-    local_path = download.maybe_download(remote_path, gs={"token": "anon"})
-    assert local_path.exists()
-
-    new_local_path = download.maybe_download(remote_path, gs={"token": "anon"})
-    assert new_local_path == local_path
