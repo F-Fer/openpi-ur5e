@@ -1310,7 +1310,7 @@ _CONFIGS = [
             action_horizon=30,
         ),
         data=LeRobotUR5DataConfig(
-            repo_id="F-Fer/ur-task1",
+            repo_id="F-Fer/ur-tasks-merged",
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
@@ -1338,7 +1338,7 @@ _CONFIGS = [
             action_horizon=30,
         ),
         data=LeRobotUR5DataConfig(
-            repo_id="F-Fer/ur-task1",
+            repo_id="F-Fer/ur-tasks-merged",
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
@@ -1366,7 +1366,7 @@ _CONFIGS = [
             action_horizon=30,
         ),
         data=LeRobotUR5DataConfig(
-            repo_id="F-Fer/ur-task1",
+            repo_id="F-Fer/ur-tasks-merged",
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
@@ -1394,7 +1394,7 @@ _CONFIGS = [
             action_horizon=30,
         ),
         data=LeRobotUR5DataConfig(
-            repo_id="F-Fer/ur-task1",
+            repo_id="F-Fer/ur-tasks-merged",
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
@@ -1417,7 +1417,7 @@ _CONFIGS = [
         name="pi0_ur_tasks_merged_freeze_paligemma",
         model=pi0_config.Pi0Config(action_horizon=30, freeze_paligemma=True),
         data=LeRobotUR5DataConfig(
-            repo_id="F-Fer/ur-task1",
+            repo_id="F-Fer/ur-tasks-merged",
             base_config=DataConfig(
                 prompt_from_task=True,
             ),
