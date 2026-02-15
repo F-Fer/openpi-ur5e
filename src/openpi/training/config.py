@@ -1351,6 +1351,7 @@ _CONFIGS = [
             paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
         ).get_freeze_filter(),
         ema_decay=None,
+        save_interval=5_000,
         keep_period=10_000,
         batch_size=24,
     ),
@@ -1379,6 +1380,7 @@ _CONFIGS = [
             paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
         ).get_freeze_filter(),
         ema_decay=None,
+        save_interval=5_000,
         keep_period=10_000,
         batch_size=24,
     ),
@@ -1407,6 +1409,7 @@ _CONFIGS = [
             paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
         ).get_freeze_filter(),
         ema_decay=None,
+        save_interval=5_000,
         keep_period=10_000,
         batch_size=24,
     ),
