@@ -1464,7 +1464,6 @@ _CONFIGS = [
         num_train_steps=60_000,
         freeze_filter=pi0_config.Pi0Config(freeze_paligemma=True).get_freeze_filter(),
         ema_decay=None,
-        save_interval=10_000,
         save_interval=5_000,
         keep_period=10_000,
         batch_size=24,
