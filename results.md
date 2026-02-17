@@ -39,3 +39,9 @@
 07:09:10.369 [I] Parameter summary: total=3,354,391,312, trainable=534,394,640 (15.93%), frozen=2,819,996,672 (2251:train.py:77)
 07:09:10.369 [I] Memory (params only): total=7.24 GiB, trainable=1.99 GiB, frozen=5.25 GiB        (2251:train.py:84)
 07:09:10.369 [I] Memory (optimizer state): 3.98 GiB                                               (2251:train.py:90)
+
+## Freeze VLM | Action Expert FFT
+
+07:33:33.398 [I] Parameter summary: total=3,238,048,528, trainable=314,713,120 (9.72%), frozen=2,923,335,408 (918:train.py:77)
+07:33:33.399 [I] Memory (params only): total=6.62 GiB, trainable=1.17 GiB, frozen=5.45 GiB        (918:train.py:84)
+07:33:33.399 [I] Memory (optimizer state): 2.34 GiB                                               (918:train.py:90)
