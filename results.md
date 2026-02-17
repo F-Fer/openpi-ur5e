@@ -2,6 +2,11 @@
 
 ## Uniform
 
+### FFT
+
+{'total_params': 3238048528, 'trainable_params': 3238048528, 'params_gib': 12.06, 'opt_gib': 24.13, 'ema_gib': 12.06, 'bytes_in_use_gib': 36.21860647201538}
+
+
 ### Rank 16 | uniform
 
 07:11:02.373 [I] Parameter summary: total=3,276,976,912, trainable=456,980,240 (13.95%), frozen=2,819,996,672 (8126:train.py:77)
