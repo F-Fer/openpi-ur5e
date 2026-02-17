@@ -2,10 +2,6 @@
 
 ## Uniform
 
-´´´
-XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py pi0_ur_tasks_merged_lora_r16_uniform --exp-name=r16_uniform_0 --overwrite
-´´´
-
 ### Rank 16 | uniform
 
 07:11:02.373 [I] Parameter summary: total=3,276,976,912, trainable=456,980,240 (13.95%), frozen=2,819,996,672 (8126:train.py:77)
@@ -23,3 +19,18 @@ XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 uv run scripts/train.py pi0_ur_tasks_merged_l
 07:15:18.672 [I] Parameter summary: total=3,393,762,064, trainable=573,765,392 (16.91%), frozen=2,819,996,672 (8193:train.py:77)
 07:15:18.673 [I] Memory (params only): total=7.39 GiB, trainable=2.14 GiB, frozen=5.25 GiB        (8193:train.py:84)
 07:15:18.673 [I] Memory (optimizer state): 4.27 GiB                                               (8193:train.py:90)
+
+
+## Asymmetric
+
+## Action Expert Rank 16 | VLM Rank 128
+
+07:08:09.752 [I] Parameter summary: total=3,472,061,200, trainable=652,064,528 (18.78%), frozen=2,819,996,672 (1728:train.py:77)
+07:08:09.752 [I] Memory (params only): total=7.68 GiB, trainable=2.43 GiB, frozen=5.25 GiB        (1728:train.py:84)
+07:08:09.753 [I] Memory (optimizer state): 4.86 GiB                                               (1728:train.py:90)
+
+## Action Expert Rank 128| VLM Rank 16
+
+07:09:10.369 [I] Parameter summary: total=3,354,391,312, trainable=534,394,640 (15.93%), frozen=2,819,996,672 (2251:train.py:77)
+07:09:10.369 [I] Memory (params only): total=7.24 GiB, trainable=1.99 GiB, frozen=5.25 GiB        (2251:train.py:84)
+07:09:10.369 [I] Memory (optimizer state): 3.98 GiB                                               (2251:train.py:90)
