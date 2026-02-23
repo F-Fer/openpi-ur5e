@@ -1299,6 +1299,35 @@ _CONFIGS = [
     # LoRA rank ablation study
     #
     TrainConfig(
+        name="pi0_ur_tasks_merged_lora_r8_uniform",
+        model=pi0_config.Pi0Config(
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+            paligemma_lora_rank=8, # Set this to 8 too
+            paligemma_lora_alpha=8, # Set this to 8 too
+            action_expert_lora_rank=8, # Set this to 8 too
+            action_expert_lora_alpha=8, # Set this to 8 too
+            action_horizon=30,
+        ),
+        data=LeRobotUR5DataConfig(
+            repo_id="F-Fer/ur-tasks-merged",
+            base_config=DataConfig(
+                prompt_from_task=True,
+            ),
+            assets=AssetsConfig(asset_id="F-Fer/ur-tasks-merged"),
+            extra_delta_transform=True,
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
+        num_train_steps=60_000,
+        freeze_filter=pi0_config.Pi0Config(
+            paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
+        ).get_freeze_filter(),
+        ema_decay=None,
+        save_interval=10_000,
+        keep_period=10_000,
+        batch_size=24,
+    ),
+    TrainConfig(
         name="pi0_ur_tasks_merged_lora_r16_uniform",
         model=pi0_config.Pi0Config(
             paligemma_variant="gemma_2b_lora",
@@ -1382,6 +1411,64 @@ _CONFIGS = [
         ).get_freeze_filter(),
         ema_decay=None,
         save_interval=5_000,
+        keep_period=10_000,
+        batch_size=24,
+    ),
+    TrainConfig(
+        name="pi0_ur_tasks_merged_lora_r128_uniform",
+        model=pi0_config.Pi0Config(
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+            paligemma_lora_rank=128, # Set this to 128 too
+            paligemma_lora_alpha=128, # Set this to 128 too
+            action_expert_lora_rank=128, # Set this to 128 too
+            action_expert_lora_alpha=128, # Set this to 128 too
+            action_horizon=30,
+        ),
+        data=LeRobotUR5DataConfig(
+            repo_id="F-Fer/ur-tasks-merged",
+            base_config=DataConfig(
+                prompt_from_task=True,
+            ),
+            assets=AssetsConfig(asset_id="F-Fer/ur-tasks-merged"),
+            extra_delta_transform=True,
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
+        num_train_steps=60_000,
+        freeze_filter=pi0_config.Pi0Config(
+            paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
+        ).get_freeze_filter(),
+        ema_decay=None,
+        save_interval=10_000,
+        keep_period=10_000,
+        batch_size=24,
+    ),
+    TrainConfig(
+        name="pi0_ur_tasks_merged_lora_r256_uniform",
+        model=pi0_config.Pi0Config(
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+            paligemma_lora_rank=256, # Set this to 256 too
+            paligemma_lora_alpha=256, # Set this to 256 too
+            action_expert_lora_rank=256, # Set this to 256 too
+            action_expert_lora_alpha=256, # Set this to 256 too
+            action_horizon=30,
+        ),
+        data=LeRobotUR5DataConfig(
+            repo_id="F-Fer/ur-tasks-merged",
+            base_config=DataConfig(
+                prompt_from_task=True,
+            ),
+            assets=AssetsConfig(asset_id="F-Fer/ur-tasks-merged"),
+            extra_delta_transform=True,
+        ),
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi0_base/params"),
+        num_train_steps=60_000,
+        freeze_filter=pi0_config.Pi0Config(
+            paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
+        ).get_freeze_filter(),
+        ema_decay=None,
+        save_interval=10_000,
         keep_period=10_000,
         batch_size=24,
     ),
