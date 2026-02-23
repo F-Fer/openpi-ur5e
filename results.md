@@ -7,6 +7,12 @@
 {'total_params': 3238048528, 'trainable_params': 3238048528, 'params_gib': 12.06, 'opt_gib': 24.13, 'ema_gib': 12.06, 'bytes_in_use_gib': 36.21860647201538}
 
 
+### Rank 8 | uniform
+
+07:05:36.374 [I] Parameter summary: total=3,257,512,720, trainable=437,516,048 (13.43%), frozen=2,819,996,672 (1551:train.py:77)
+07:05:36.375 [I] Memory (params only): total=6.88 GiB, trainable=1.63 GiB, frozen=5.25 GiB        (1551:train.py:84)
+07:05:36.375 [I] Memory (optimizer state): 3.26 GiB                                               (1551:train.py:90)
+
 ### Rank 16 | uniform
 
 07:11:02.373 [I] Parameter summary: total=3,276,976,912, trainable=456,980,240 (13.95%), frozen=2,819,996,672 (8126:train.py:77)
@@ -24,6 +30,18 @@
 07:15:18.672 [I] Parameter summary: total=3,393,762,064, trainable=573,765,392 (16.91%), frozen=2,819,996,672 (8193:train.py:77)
 07:15:18.673 [I] Memory (params only): total=7.39 GiB, trainable=2.14 GiB, frozen=5.25 GiB        (8193:train.py:84)
 07:15:18.673 [I] Memory (optimizer state): 4.27 GiB                                               (8193:train.py:90)
+
+## Rank 128 | uniform
+
+06:46:14.327 [I] Parameter summary: total=3,549,475,600, trainable=729,478,928 (20.55%), frozen=2,819,996,672 (2146:train.py:77)
+06:46:14.327 [I] Memory (params only): total=7.97 GiB, trainable=2.72 GiB, frozen=5.25 GiB        (2146:train.py:84)
+06:46:14.327 [I] Memory (optimizer state): 5.44 GiB                                               (2146:train.py:90)
+
+## Rank 256 | uniform
+
+06:49:28.312 [I] Parameter summary: total=3,860,902,672, trainable=1,040,906,000 (26.96%), frozen=2,819,996,672 (945:train.py:77)
+06:49:28.312 [I] Memory (params only): total=9.13 GiB, trainable=3.88 GiB, frozen=5.25 GiB        (945:train.py:84)
+06:49:28.313 [I] Memory (optimizer state): 7.76 GiB                                               (945:train.py:90)
 
 
 ## Asymmetric
