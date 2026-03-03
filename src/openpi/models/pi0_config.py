@@ -8,6 +8,7 @@ from typing_extensions import override
 
 from openpi.models import model as _model
 import openpi.models.gemma as _gemma
+import openpi.models.lora as lora
 from openpi.shared import array_typing as at
 import openpi.shared.nnx_utils as nnx_utils
 
@@ -25,6 +26,9 @@ class Pi0Config(_model.BaseModelConfig):
     paligemma_lora_alpha: float | None = None
     action_expert_lora_rank: int | None = None
     action_expert_lora_alpha: float | None = None
+    # Optional LoRA for the SigLIP vision encoder MLP layers.
+    siglip_lora_rank: int | None = None
+    siglip_lora_alpha: float | None = None
     # If true, freeze the paligemma backbone (expert 0) while fully fine-tuning the action expert (expert 1).
     # This is a middle ground between full fine-tuning and LoRA: cheaper than full fine-tuning but more
     # expressive than LoRA on the action expert. Should not be used together with LoRA variants.
@@ -40,6 +44,15 @@ class Pi0Config(_model.BaseModelConfig):
     pi05: bool = False
     # This config option is not used directly by the model, but it is read by the ModelTransformFactory.
     discrete_state_input: bool = None  # type: ignore
+
+    @property
+    def siglip_lora_config(self) -> lora.LoRAConfig | None:
+        if self.siglip_lora_rank is None:
+            return None
+        return lora.LoRAConfig(
+            rank=self.siglip_lora_rank,
+            alpha=self.siglip_lora_alpha or self.siglip_lora_rank,
+        )
 
     def __post_init__(self):
         if self.max_token_len is None:
@@ -112,6 +125,10 @@ class Pi0Config(_model.BaseModelConfig):
             filters.append(
                 action_expert_params_filter,
             )
+            has_lora = True
+
+        if self.siglip_lora_rank is not None:
+            filters.append(nnx_utils.PathRegex(".*img.*"))
             has_lora = True
 
         if has_lora:
