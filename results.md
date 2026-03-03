@@ -63,3 +63,17 @@
 07:33:33.398 [I] Parameter summary: total=3,238,048,528, trainable=314,713,120 (9.72%), frozen=2,923,335,408 (918:train.py:77)
 07:33:33.399 [I] Memory (params only): total=6.62 GiB, trainable=1.17 GiB, frozen=5.45 GiB        (918:train.py:84)
 07:33:33.399 [I] Memory (optimizer state): 2.34 GiB                                               (918:train.py:90)
+
+## SigLIP Abilation
+
+### Apply LoRA to SigLIP
+
+14:03:23.972 [I] Parameter summary: total=3,325,333,264, trainable=90,532,896 (2.72%), frozen=3,234,800,368 (6688:train.py:77)
+14:03:23.972 [I] Memory (params only): total=6.36 GiB, trainable=345.36 MiB, frozen=6.03 GiB      (6688:train.py:84)
+14:03:23.972 [I] Memory (optimizer state): 690.71 MiB                                             (6688:train.py:90)
+
+### Freeze SigLIP entirely
+
+14:17:08.409 [I] Parameter summary: total=3,315,905,296, trainable=81,104,928 (2.45%), frozen=3,234,800,368 (937:train.py:77)
+14:17:08.410 [I] Memory (params only): total=6.33 GiB, trainable=309.39 MiB, frozen=6.03 GiB      (937:train.py:84)
+14:17:08.410 [I] Memory (optimizer state): 618.78 MiB                                             (937:train.py:90)
