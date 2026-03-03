@@ -100,8 +100,6 @@ class Pi0Config(_model.BaseModelConfig):
 
     def get_freeze_filter(self) -> nnx.filterlib.Filter:
         """Returns the freeze filter based on the model config."""
-        filters = []
-        has_lora = False
         gemma_params_filter = nnx_utils.PathRegex(".*llm.*")
         action_expert_params_filter = nnx_utils.PathRegex(".*llm.*_1.*")
         if self.freeze_paligemma and "lora" not in self.paligemma_variant and "lora" not in self.action_expert_variant:
@@ -111,31 +109,34 @@ class Pi0Config(_model.BaseModelConfig):
                 nnx.All(gemma_params_filter, nnx.Not(action_expert_params_filter)),
                 img_params_filter,
             )
+
+        # Build freeze filter for LoRA configs. Region filters (disjoint param subtrees) are
+        # combined with Any, then narrowing filters (exclusions) are applied with All.
+        region_filters = []
+        narrowing_filters = []
+        has_lora = False
+
         if "lora" in self.paligemma_variant:
-            filters.append(
-                gemma_params_filter,
-            )
+            region_filters.append(gemma_params_filter)
             if "lora" not in self.action_expert_variant:
-                # If only freeze gemma params, exclude action expert params.
-                filters.append(
-                    nnx.Not(action_expert_params_filter),
-                )
+                # If only paligemma has LoRA, exclude action expert params from freeze region.
+                narrowing_filters.append(nnx.Not(action_expert_params_filter))
             has_lora = True
         elif "lora" in self.action_expert_variant:
-            filters.append(
-                action_expert_params_filter,
-            )
+            region_filters.append(action_expert_params_filter)
             has_lora = True
 
         if self.siglip_lora_rank is not None:
-            filters.append(nnx_utils.PathRegex(".*img.*"))
+            region_filters.append(nnx_utils.PathRegex(".*img.*"))
             has_lora = True
 
         if has_lora:
-            # If any lora is used, exclude all lora params.
-            filters.append(
-                nnx.Not(nnx_utils.PathRegex(".*lora.*")),
-            )
-        if not filters:
+            # Exclude all LoRA params from freezing (they must remain trainable).
+            narrowing_filters.append(nnx.Not(nnx_utils.PathRegex(".*lora.*")))
+
+        if not region_filters:
             return nnx.Nothing
-        return nnx.All(*filters)
+
+        combined_region = nnx.Any(*region_filters) if len(region_filters) > 1 else region_filters[0]
+        all_filters = [combined_region, *narrowing_filters]
+        return nnx.All(*all_filters)
